@@ -14,11 +14,21 @@ parser! {
     rule let_binding() -> Expr
       = "let" _ id:identifier() _ "=" _ expr:expr() { Expr::Let(id.into(), Box::new(expr)) }
 
+    // assign must hold the highest precedence
     rule expr() -> Expr
-      = let_binding() / integer_literal() / identifier_expr()
+      = assign() / let_binding() / integer_literal() / identifier_expr() / list()
 
     rule identifier_expr() -> Expr
       = id:identifier() { Expr::Var(id.into()) }
+
+    rule list() -> Expr
+      = "[" lst:(expr() ** (_ "," _)) "]" { Expr::List(lst) }
+
+    rule assignable() -> Expr
+      = id:identifier_expr() { id }
+
+    rule assign() -> Expr
+      = lhs:assignable() _ "=" _ rhs:expr() { Expr::Assign(Box::new(lhs), Box::new(rhs)) }
 
     rule _() = whitespace()?
 
@@ -30,6 +40,9 @@ parser! {
 #[derive(Debug)]
 pub enum Expr {
     Let(String, Box<Expr>),
+    Assign(Box<Expr>, Box<Expr>),
     Var(String),
     Int(i64),
+    // @todo: box members
+    List(Vec<Expr>),
 }

@@ -8,6 +8,8 @@ fn main() {
     let source = r#"
         let n = 2
         let p = 3
+        n = p
+        p = [2, 3, 4]
     "#;
 
     match intrinsic_parser::program(source) {
