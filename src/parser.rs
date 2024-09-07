@@ -22,7 +22,7 @@ parser! {
 
     // assign must hold the highest precedence
     rule primary() -> Expr
-      = assign() / paren_expr() / let_binding() / integer_literal() /
+      = assign() / paren_expr() / if_expr() / let_binding() / integer_literal() /
         identifier_expr() / list() / record()
 
     rule expr() -> Expr
@@ -88,6 +88,14 @@ parser! {
         Expr::Compare(Box::new(lhs), op_enum, Box::new(rhs))
     } / primary()
 
+    rule if_expr() -> Expr
+      = "if" _ cond:expr() _ "then" _ then_body:expr() _ "end" {
+      Expr::If(Box::new(cond), Box::new(then_body), None)
+    }
+      / "if" _ cond:expr() _ "then" _ then_body:expr() _ "else" _ else_body:expr() _ "end" {
+      Expr::If(Box::new(cond), Box::new(then_body), Some(Box::new(else_body)))
+    }
+
     rule _() = whitespace()?
 
     pub rule program() -> Vec<Expr>
@@ -105,7 +113,9 @@ pub enum Expr {
     List(Vec<Expr>),
     Record(Vec<Vec<Expr>>),
     Bin(Box<Expr>, BinOp, Box<Expr>),
+    // @fix: precedence of >= <=
     Compare(Box<Expr>, CompareOp, Box<Expr>),
+    If(Box<Expr>, Box<Expr>, Option<Box<Expr>>),
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]

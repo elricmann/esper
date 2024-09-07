@@ -16,7 +16,12 @@ fn main() {
         (k > 1)
 
         let s = (3 + 4)
-        let s = (3 / (s * 2))
+        let t = (3 / (s * 2))
+
+        let u = if a > 2 then 2 end
+        let v = if b < 2 then 2 - 3 else 3 end
+
+        if true then false else true end
     "#;
 
     match intrinsic_parser::program(source) {
