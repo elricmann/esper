@@ -21,15 +21,18 @@ parser! {
       = lhs:assignable() _ "=" _ rhs:expr() { Expr::Assign(Box::new(lhs), Box::new(rhs)) }
 
     // assign must hold the highest precedence
-    rule expr() -> Expr
+    rule primary() -> Expr
       = assign() / let_binding() / integer_literal() / identifier_expr() / list() / record()
+    
+    rule expr() -> Expr
+      = compare() / primary()
 
     rule identifier_expr() -> Expr
       = id:identifier() { Expr::Var(id.into()) }
 
     rule list() -> Expr
       = "[" lst:(expr() ** (_ "," _)) "]" { Expr::List(lst) }
-    
+
     rule record_key() -> Expr
       = identifier_expr() / integer_literal()
 
@@ -41,6 +44,20 @@ parser! {
       let kv_pairs = entries.into_iter().map(|(key, value)| vec![key, value]).collect();
 
       Expr::Record(kv_pairs)
+    }
+
+    rule compare_op() -> &'input str
+    = op:$(">" / "<" / ">=" / "<=") { op }
+
+    rule compare() -> Expr
+    = lhs:primary() _ op:compare_op() _ rhs:primary() {
+      match op {
+        ">" => Expr::Gt(Box::new(lhs), Box::new(rhs)),
+        "<" => Expr::Lt(Box::new(lhs), Box::new(rhs)),
+        ">=" => Expr::Gte(Box::new(lhs), Box::new(rhs)),
+        "<=" => Expr::Lte(Box::new(lhs), Box::new(rhs)),
+        _ => unreachable!(),
+      }
     }
 
     rule _() = whitespace()?
@@ -59,4 +76,8 @@ pub enum Expr {
     // @todo: box members
     List(Vec<Expr>),
     Record(Vec<Vec<Expr>>),
+    Gt(Box<Expr>, Box<Expr>),
+    Lt(Box<Expr>, Box<Expr>),
+    Gte(Box<Expr>, Box<Expr>),
+    Lte(Box<Expr>, Box<Expr>),
 }
