@@ -10,11 +10,13 @@ fn main() {
         let p = 3
         n = p
         p = [2, 3, 4]
+        let k = { p: 3, q: 4 }
+        let q = { 2: p, 4: q }
     "#;
 
     match intrinsic_parser::program(source) {
         Ok(program) => {
-            println!("{:?}", program);
+            dbg!(program);
         }
 
         Err(err) => {

@@ -14,21 +14,34 @@ parser! {
     rule let_binding() -> Expr
       = "let" _ id:identifier() _ "=" _ expr:expr() { Expr::Let(id.into(), Box::new(expr)) }
 
+    rule assignable() -> Expr
+      = id:identifier_expr() { id }
+
+    rule assign() -> Expr
+      = lhs:assignable() _ "=" _ rhs:expr() { Expr::Assign(Box::new(lhs), Box::new(rhs)) }
+
     // assign must hold the highest precedence
     rule expr() -> Expr
-      = assign() / let_binding() / integer_literal() / identifier_expr() / list()
+      = assign() / let_binding() / integer_literal() / identifier_expr() / list() / record()
 
     rule identifier_expr() -> Expr
       = id:identifier() { Expr::Var(id.into()) }
 
     rule list() -> Expr
       = "[" lst:(expr() ** (_ "," _)) "]" { Expr::List(lst) }
+    
+    rule record_key() -> Expr
+      = identifier_expr() / integer_literal()
 
-    rule assignable() -> Expr
-      = id:identifier_expr() { id }
+    rule record_entry() -> (Expr, Expr)
+      = key:record_key() _ ":" _ value:expr() { (key, value) }
 
-    rule assign() -> Expr
-      = lhs:assignable() _ "=" _ rhs:expr() { Expr::Assign(Box::new(lhs), Box::new(rhs)) }
+    rule record() -> Expr
+    = "{" _ entries:(record_entry() ** (_ "," _)) _ "}" {
+      let kv_pairs = entries.into_iter().map(|(key, value)| vec![key, value]).collect();
+
+      Expr::Record(kv_pairs)
+    }
 
     rule _() = whitespace()?
 
@@ -37,7 +50,7 @@ parser! {
   }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum Expr {
     Let(String, Box<Expr>),
     Assign(Box<Expr>, Box<Expr>),
@@ -45,4 +58,5 @@ pub enum Expr {
     Int(i64),
     // @todo: box members
     List(Vec<Expr>),
+    Record(Vec<Vec<Expr>>),
 }
