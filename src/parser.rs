@@ -52,20 +52,24 @@ parser! {
 
     rule add_sub() -> Expr
       = lhs:mul_div() _ op:$("+" / "-") _ rhs:mul_div() {
-      match op {
-        "+" => Expr::Add(Box::new(lhs), Box::new(rhs)),
-        "-" => Expr::Sub(Box::new(lhs), Box::new(rhs)),
-        _ => unreachable!(),
-      }
+        let op_enum = match op {
+          "+" => BinOp::Add,
+          "-" => BinOp::Sub,
+          _ => unreachable!(),
+        };
+
+        Expr::Bin(Box::new(lhs), op_enum, Box::new(rhs))
     } / mul_div()
 
     rule mul_div() -> Expr
       = lhs:primary() _ op:$("*" / "/") _ rhs:primary() {
-      match op {
-        "*" => Expr::Mul(Box::new(lhs), Box::new(rhs)),
-        "/" => Expr::Div(Box::new(lhs), Box::new(rhs)),
-        _ => unreachable!(),
-      }
+        let op_enum = match op {
+          "*" => BinOp::Mul,
+          "/" => BinOp::Div,
+          _ => unreachable!(),
+        };
+
+        Expr::Bin(Box::new(lhs), op_enum, Box::new(rhs))
     } / compare()
 
     rule compare_op() -> &'input str
@@ -73,13 +77,15 @@ parser! {
 
     rule compare() -> Expr
       = lhs:primary() _ op:compare_op() _ rhs:primary() {
-      match op {
-        ">" => Expr::Gt(Box::new(lhs), Box::new(rhs)),
-        "<" => Expr::Lt(Box::new(lhs), Box::new(rhs)),
-        ">=" => Expr::Gte(Box::new(lhs), Box::new(rhs)),
-        "<=" => Expr::Lte(Box::new(lhs), Box::new(rhs)),
-        _ => unreachable!(),
-      }
+        let op_enum = match op {
+          ">" => CompareOp::Gt,
+          "<" => CompareOp::Lt,
+          ">=" => CompareOp::Gte,
+          "<=" => CompareOp::Lte,
+          _ => unreachable!(),
+        };
+
+        Expr::Compare(Box::new(lhs), op_enum, Box::new(rhs))
     } / primary()
 
     rule _() = whitespace()?
@@ -98,12 +104,22 @@ pub enum Expr {
     // @todo: box members
     List(Vec<Expr>),
     Record(Vec<Vec<Expr>>),
-    Add(Box<Expr>, Box<Expr>),
-    Sub(Box<Expr>, Box<Expr>),
-    Mul(Box<Expr>, Box<Expr>),
-    Div(Box<Expr>, Box<Expr>),
-    Gt(Box<Expr>, Box<Expr>),
-    Lt(Box<Expr>, Box<Expr>),
-    Gte(Box<Expr>, Box<Expr>),
-    Lte(Box<Expr>, Box<Expr>),
+    Bin(Box<Expr>, BinOp, Box<Expr>),
+    Compare(Box<Expr>, CompareOp, Box<Expr>),
+}
+
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub enum BinOp {
+    Add,
+    Sub,
+    Mul,
+    Div,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub enum CompareOp {
+    Gt,
+    Lt,
+    Gte,
+    Lte,
 }

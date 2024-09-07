@@ -16,6 +16,7 @@ fn main() {
         (k > 1)
 
         let s = (3 + 4)
+        let s = (3 / (s * 2))
     "#;
 
     match intrinsic_parser::program(source) {
