@@ -22,7 +22,7 @@ parser! {
 
     // assign must hold the highest precedence
     rule primary() -> Expr
-      = assign() / paren_expr() / if_expr() / let_binding() / integer_literal() /
+      = assign() / paren_expr() / if_expr() / fn_expr() / let_binding() / integer_literal() /
         identifier_expr() / list() / record()
 
     rule expr() -> Expr
@@ -96,6 +96,18 @@ parser! {
       Expr::If(Box::new(cond), Box::new(then_body), Some(Box::new(else_body)))
     }
 
+    rule fn_expr() -> Expr
+      = "|" _ args:(identifier() ** (_ "," _)) _ "|" _ body:(non_empty_expr_list()) _ "end" {
+      Expr::Fn(args.into_iter().map(|arg| arg.into()).collect(), body)
+    }
+
+    rule non_empty_expr_list() -> Vec<Expr>
+      = first:expr() rest:(expr())* {
+        let mut exprs = vec![first];
+        exprs.extend(rest);
+        exprs
+    }
+
     rule _() = whitespace()?
 
     pub rule program() -> Vec<Expr>
@@ -116,6 +128,7 @@ pub enum Expr {
     // @fix: precedence of >= <=
     Compare(Box<Expr>, CompareOp, Box<Expr>),
     If(Box<Expr>, Box<Expr>, Option<Box<Expr>>),
+    Fn(Vec<String>, Vec<Expr>),
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]

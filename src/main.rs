@@ -22,6 +22,13 @@ fn main() {
         let v = if b < 2 then 2 - 3 else 3 end
 
         if true then false else true end
+
+        let add = |a, b| a + b end
+
+        ||
+          let n = 2
+          let p = 3
+        end
     "#;
 
     match intrinsic_parser::program(source) {
