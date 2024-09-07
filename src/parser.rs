@@ -22,10 +22,13 @@ parser! {
 
     // assign must hold the highest precedence
     rule primary() -> Expr
-      = assign() / let_binding() / integer_literal() / identifier_expr() / list() / record()
-    
+      = assign() / paren_expr() / let_binding() / integer_literal() / identifier_expr() / list() / record()
+
     rule expr() -> Expr
       = compare() / primary()
+    
+    rule paren_expr() -> Expr
+      = "(" _ e:expr() _ ")" { e }
 
     rule identifier_expr() -> Expr
       = id:identifier() { Expr::Var(id.into()) }
@@ -40,17 +43,17 @@ parser! {
       = key:record_key() _ ":" _ value:expr() { (key, value) }
 
     rule record() -> Expr
-    = "{" _ entries:(record_entry() ** (_ "," _)) _ "}" {
+      = "{" _ entries:(record_entry() ** (_ "," _)) _ "}" {
       let kv_pairs = entries.into_iter().map(|(key, value)| vec![key, value]).collect();
 
       Expr::Record(kv_pairs)
     }
 
     rule compare_op() -> &'input str
-    = op:$(">" / "<" / ">=" / "<=") { op }
+      = op:$(">" / "<" / ">=" / "<=") { op }
 
     rule compare() -> Expr
-    = lhs:primary() _ op:compare_op() _ rhs:primary() {
+      = lhs:primary() _ op:compare_op() _ rhs:primary() {
       match op {
         ">" => Expr::Gt(Box::new(lhs), Box::new(rhs)),
         "<" => Expr::Lt(Box::new(lhs), Box::new(rhs)),
