@@ -22,11 +22,12 @@ parser! {
 
     // assign must hold the highest precedence
     rule primary() -> Expr
-      = assign() / paren_expr() / let_binding() / integer_literal() / identifier_expr() / list() / record()
+      = assign() / paren_expr() / let_binding() / integer_literal() /
+        identifier_expr() / list() / record()
 
     rule expr() -> Expr
-      = compare() / primary()
-    
+      = add_sub() / compare() / primary()
+
     rule paren_expr() -> Expr
       = "(" _ e:expr() _ ")" { e }
 
@@ -49,6 +50,24 @@ parser! {
       Expr::Record(kv_pairs)
     }
 
+    rule add_sub() -> Expr
+      = lhs:mul_div() _ op:$("+" / "-") _ rhs:mul_div() {
+      match op {
+        "+" => Expr::Add(Box::new(lhs), Box::new(rhs)),
+        "-" => Expr::Sub(Box::new(lhs), Box::new(rhs)),
+        _ => unreachable!(),
+      }
+    } / mul_div()
+
+    rule mul_div() -> Expr
+      = lhs:primary() _ op:$("*" / "/") _ rhs:primary() {
+      match op {
+        "*" => Expr::Mul(Box::new(lhs), Box::new(rhs)),
+        "/" => Expr::Div(Box::new(lhs), Box::new(rhs)),
+        _ => unreachable!(),
+      }
+    } / compare()
+
     rule compare_op() -> &'input str
       = op:$(">" / "<" / ">=" / "<=") { op }
 
@@ -61,7 +80,7 @@ parser! {
         "<=" => Expr::Lte(Box::new(lhs), Box::new(rhs)),
         _ => unreachable!(),
       }
-    }
+    } / primary()
 
     rule _() = whitespace()?
 
@@ -79,6 +98,10 @@ pub enum Expr {
     // @todo: box members
     List(Vec<Expr>),
     Record(Vec<Vec<Expr>>),
+    Add(Box<Expr>, Box<Expr>),
+    Sub(Box<Expr>, Box<Expr>),
+    Mul(Box<Expr>, Box<Expr>),
+    Div(Box<Expr>, Box<Expr>),
     Gt(Box<Expr>, Box<Expr>),
     Lt(Box<Expr>, Box<Expr>),
     Gte(Box<Expr>, Box<Expr>),

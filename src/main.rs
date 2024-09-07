@@ -12,9 +12,10 @@ fn main() {
         p = [2, 3, 4]
         let k = { p: 3, q: 4 }
         let q = { 2: p, 4: q }
-        r = (2 < 3)
-
+        r = (2 < (3))
         (k > 1)
+
+        let s = (3 + 4)
     "#;
 
     match intrinsic_parser::program(source) {
