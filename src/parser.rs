@@ -23,6 +23,18 @@ parser! {
       = start:(integer_literal() / identifier_expr()) ".." end:(integer_literal() / identifier_expr()) {
           Expr::Range(Box::new(start), Box::new(end))
       }
+    
+    rule member_expr() -> Expr
+      = base:identifier_expr() "." rest:(ident:identifier_expr())+ {
+        let mut expr = base;
+     
+        for ident in rest {
+            expr = Expr::Member(Box::new(expr), Box::new(ident));
+        }
+     
+        expr
+    }
+
 
     rule let_binding() -> Expr
       = "let" _ id:identifier() _ "=" _ expr:expr() { Expr::Let(id.into(), Box::new(expr)) }
@@ -35,7 +47,7 @@ parser! {
 
     // assign must hold the highest precedence
     rule primary() -> Expr
-      = assign() / paren_expr() / range_expr() / if_expr() / fn_expr() / let_binding() / bool_literal() / integer_literal() /
+      = assign() / paren_expr() / member_expr() / range_expr() / loop_expr() / if_expr() / fn_expr() / let_binding() / bool_literal() / integer_literal() /
         identifier_expr() / list() / record()
 
     rule expr() -> Expr
@@ -109,6 +121,11 @@ parser! {
       Expr::If(Box::new(cond), then_body, Some(else_body))
     }
 
+    rule loop_expr() -> Expr
+      = "loop" _ loop_var:expr() _ "in" _ iter:primary() _ body:exprs_list() _ "end" {
+        Expr::Loop(Box::new(loop_var), Box::new(iter), body)
+    }
+
     rule fn_expr() -> Expr
       = "|" _ args:(identifier() ** (_ "," _)) _ "|" _ body:exprs_list() _ "end" {
       Expr::Fn(args.into_iter().map(|arg| arg.into()).collect(), body)
@@ -144,7 +161,9 @@ pub enum Expr {
     // @fix: precedence of >= <=
     Compare(Box<Expr>, CompareOp, Box<Expr>),
     If(Box<Expr>, Vec<Expr>, Option<Vec<Expr>>),
+    Loop(Box<Expr>, Box<Expr>, Vec<Expr>),
     Fn(Vec<String>, Vec<Expr>),
+    Member(Box<Expr>, Box<Expr>),
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]

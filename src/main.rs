@@ -19,6 +19,12 @@ fn main() {
         let s = i..n
 
         if a > 2 then true else false end
+
+        loop i in 2..3
+          i * 2
+        end
+
+        let a = b.c
     "#;
 
     match intrinsic_parser::program(source) {
