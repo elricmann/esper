@@ -17,6 +17,8 @@ fn main() {
 
         let r = 2..3
         let s = i..n
+
+        if a > 2 then true else false end
     "#;
 
     match intrinsic_parser::program(source) {

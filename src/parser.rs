@@ -102,11 +102,11 @@ parser! {
     } / primary()
 
     rule if_expr() -> Expr
-      = "if" _ cond:expr() _ "then" _ then_body:expr() _ "end" {
-      Expr::If(Box::new(cond), Box::new(then_body), None)
+      = "if" _ cond:expr() _ "then" _ then_body:exprs_list() _ "end" {
+      Expr::If(Box::new(cond), then_body, None)
     }
-      / "if" _ cond:expr() _ "then" _ then_body:expr() _ "else" _ else_body:expr() _ "end" {
-      Expr::If(Box::new(cond), Box::new(then_body), Some(Box::new(else_body)))
+      / "if" _ cond:expr() _ "then" _ then_body:exprs_list() _ "else" _ else_body:exprs_list() _ "end" {
+      Expr::If(Box::new(cond), then_body, Some(else_body))
     }
 
     rule fn_expr() -> Expr
@@ -143,7 +143,7 @@ pub enum Expr {
     Bin(Box<Expr>, BinOp, Box<Expr>),
     // @fix: precedence of >= <=
     Compare(Box<Expr>, CompareOp, Box<Expr>),
-    If(Box<Expr>, Box<Expr>, Option<Box<Expr>>),
+    If(Box<Expr>, Vec<Expr>, Option<Vec<Expr>>),
     Fn(Vec<String>, Vec<Expr>),
 }
 
