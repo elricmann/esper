@@ -13,8 +13,16 @@ parser! {
       = id:identifier() { Expr::TypedSymbol(id.into()) }
 
     rule type_alias() -> Expr
-      = "type" _ id:identifier() _ "=" _ type_expr:typed_expr() _ "end" {
-      Expr::TypeAlias(id.into(), Box::new(type_expr))
+    = "type" _ id:identifier() _ "=" _ type_expr:typed_expr() _ "end" {
+        Expr::TypeAlias(id.into(), vec![], Box::new(type_expr))
+      }
+    / "type" _ id:identifier() _ ty:type_generic() _ "=" _ type_expr:typed_expr() _ "end" {
+        Expr::TypeAlias(id.into(), ty, Box::new(type_expr))
+      }
+
+    rule type_generic() -> Vec<Expr>
+      = "<" _ args:(typed_expr() ** (_ "," _)) _ ">" {
+      args
     }
 
     rule typed_variant() -> Expr
@@ -225,7 +233,7 @@ pub enum Expr {
     TypedLiteral(Box<Expr>),
     TypedVariant(Box<Expr>, Box<Expr>),
     TypedLet(String, Box<Expr>, Box<Expr>),
-    TypeAlias(String, Box<Expr>),
+    TypeAlias(String, Vec<Expr>, Box<Expr>),
 }
 
 #[derive(Debug, Clone, PartialEq)]
