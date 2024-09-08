@@ -2,6 +2,8 @@ use peg::parser;
 
 parser! {
   pub grammar intrinsic_parser() for str {
+    rule _() = whitespace()?
+
     rule whitespace() = quiet!{[' ' | '\t' | '\n' | '\r']+}
 
     rule identifier() -> &'input str
@@ -97,21 +99,15 @@ parser! {
     }
 
     rule fn_expr() -> Expr
-      = "|" _ args:(identifier() ** (_ "," _)) _ "|" _ body:(non_empty_expr_list()) _ "end" {
+      = "|" _ args:(identifier() ** (_ "," _)) _ "|" _ body:expr_list() _ "end" {
       Expr::Fn(args.into_iter().map(|arg| arg.into()).collect(), body)
     }
 
-    rule non_empty_expr_list() -> Vec<Expr>
-      = first:expr() rest:(expr())* {
-        let mut exprs = vec![first];
-        exprs.extend(rest);
-        exprs
-    }
-
-    rule _() = whitespace()?
+    rule expr_list() -> Vec<Expr>
+      = e:expr() ** _ { e }
 
     pub rule program() -> Vec<Expr>
-      = _ exprs:(expr() ** _) _ { exprs }
+      = _ exprs:expr_list() _ { exprs }
   }
 }
 
