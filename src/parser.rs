@@ -12,8 +12,27 @@ parser! {
       = quiet!{s:$(['a'..='z' | 'A'..='Z' | '_']+)} / expected!("identifier")
       // { s.into() }
 
+      rule float_literal() -> Expr
+      = sign:("-")? n:$(['0'..='9']+ "." ['0'..='9']*) {
+          let mut num = n.parse::<f64>().unwrap();
+
+          if sign.is_some() {
+              num = -num;
+          }
+
+          Expr::Float(num)
+      }
+
     rule integer_literal() -> Expr
-      = n:$(['0'..='9']+) { Expr::Int(n.parse().unwrap()) }
+      = sign:("-")? n:$(['0'..='9']+) {
+          let mut num = n.parse::<i64>().unwrap();
+
+          if sign.is_some() {
+              num = -num;
+          }
+
+          Expr::Int(num)
+      }
 
     rule bool_literal() -> Expr
       = "true" { Expr::Bool(true) }
@@ -51,7 +70,7 @@ parser! {
 
     // assign must hold the highest precedence
     rule primary() -> Expr
-      = assign() / paren_expr() / call_expr() / member_expr() / range_expr() / loop_expr() / if_expr() / fn_expr() / let_binding() / bool_literal() / integer_literal() /
+      = assign() / paren_expr() / call_expr() / member_expr() / range_expr() / loop_expr() / if_expr() / fn_expr() / let_binding() / bool_literal() / float_literal() / integer_literal() /
         identifier_expr() / list() / record()
 
     rule expr() -> Expr
@@ -150,12 +169,13 @@ parser! {
   }
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Expr {
     Let(String, Box<Expr>),
     Assign(Box<Expr>, Box<Expr>),
     Var(String),
     Int(i64),
+    Float(f64),
     Bool(bool),
     // @todo: box members
     List(Vec<Expr>),
@@ -171,7 +191,7 @@ pub enum Expr {
     Call(Box<Expr>, Vec<Expr>),
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum BinOp {
     Add,
     Sub,

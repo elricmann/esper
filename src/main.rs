@@ -30,6 +30,11 @@ fn main() {
         let p = q(r..s, t..u)
 
         w(x.y)
+
+        3.14159
+        (-2.9)
+        7
+        (-8)
     "#;
 
     match intrinsic_parser::program(source) {
