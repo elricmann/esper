@@ -23,18 +23,22 @@ parser! {
       = start:(integer_literal() / identifier_expr()) ".." end:(integer_literal() / identifier_expr()) {
           Expr::Range(Box::new(start), Box::new(end))
       }
-    
+
     rule member_expr() -> Expr
       = base:identifier_expr() "." rest:(ident:identifier_expr())+ {
         let mut expr = base;
-     
+
         for ident in rest {
             expr = Expr::Member(Box::new(expr), Box::new(ident));
         }
-     
+
         expr
     }
 
+    rule call_expr() -> Expr
+      = callee:(identifier_expr() / member_expr()) "(" _? args:(expr() ** (_ "," _)) _? ")" {
+        Expr::Call(Box::new(callee), args)
+    }
 
     rule let_binding() -> Expr
       = "let" _ id:identifier() _ "=" _ expr:expr() { Expr::Let(id.into(), Box::new(expr)) }
@@ -47,7 +51,7 @@ parser! {
 
     // assign must hold the highest precedence
     rule primary() -> Expr
-      = assign() / paren_expr() / member_expr() / range_expr() / loop_expr() / if_expr() / fn_expr() / let_binding() / bool_literal() / integer_literal() /
+      = assign() / paren_expr() / call_expr() / member_expr() / range_expr() / loop_expr() / if_expr() / fn_expr() / let_binding() / bool_literal() / integer_literal() /
         identifier_expr() / list() / record()
 
     rule expr() -> Expr
@@ -164,6 +168,7 @@ pub enum Expr {
     Loop(Box<Expr>, Box<Expr>, Vec<Expr>),
     Fn(Vec<String>, Vec<Expr>),
     Member(Box<Expr>, Box<Expr>),
+    Call(Box<Expr>, Vec<Expr>),
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]

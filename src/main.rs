@@ -8,7 +8,7 @@ fn main() {
     let source = r#"
         let add = |a, b| a + b end
 
-        let k = |a, b|
+        let m = |a, b|
           b = a
         end
 
@@ -25,6 +25,11 @@ fn main() {
         end
 
         let a = b.c
+
+        a(2, 3, n + 1)
+        let p = q(r..s, t..u)
+
+        w(x.y)
     "#;
 
     match intrinsic_parser::program(source) {
