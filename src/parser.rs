@@ -4,6 +4,8 @@ parser! {
   pub grammar intrinsic_parser() for str {
     rule _() = whitespace()?
 
+    rule newline() = quiet!{ ['\n' | '\r']+ }
+
     rule whitespace() = quiet!{[' ' | '\t' | '\n' | '\r']+}
 
     rule identifier() -> &'input str
@@ -12,6 +14,10 @@ parser! {
 
     rule integer_literal() -> Expr
       = n:$(['0'..='9']+) { Expr::Int(n.parse().unwrap()) }
+    
+    rule bool_literal() -> Expr
+      = "true" { Expr::Bool(true) }
+      / "false" { Expr::Bool(false) }
 
     rule let_binding() -> Expr
       = "let" _ id:identifier() _ "=" _ expr:expr() { Expr::Let(id.into(), Box::new(expr)) }
@@ -24,7 +30,7 @@ parser! {
 
     // assign must hold the highest precedence
     rule primary() -> Expr
-      = assign() / paren_expr() / if_expr() / fn_expr() / let_binding() / integer_literal() /
+      = assign() / paren_expr() / if_expr() / fn_expr() / let_binding() / bool_literal() / integer_literal() /
         identifier_expr() / list() / record()
 
     rule expr() -> Expr
@@ -99,15 +105,22 @@ parser! {
     }
 
     rule fn_expr() -> Expr
-      = "|" _ args:(identifier() ** (_ "," _)) _ "|" _ body:expr_list() _ "end" {
+      = "|" _ args:(identifier() ** (_ "," _)) _ "|" _ body:exprs_list() _ "end" {
       Expr::Fn(args.into_iter().map(|arg| arg.into()).collect(), body)
     }
 
-    rule expr_list() -> Vec<Expr>
-      = e:expr() ** _ { e }
+    // rule expr_inner() -> Expr
+    //   = _ first:expr() _ "in" { first }
+
+    rule exprs_list() -> Vec<Expr>
+      = first:expr() rest:(expr())* {
+        let mut exprs = vec![first];
+        exprs.extend(rest);
+        exprs
+    }
 
     pub rule program() -> Vec<Expr>
-      = _ exprs:expr_list() _ { exprs }
+      = _ exprs:(expr() ** _) _ { exprs }
   }
 }
 
@@ -117,6 +130,7 @@ pub enum Expr {
     Assign(Box<Expr>, Box<Expr>),
     Var(String),
     Int(i64),
+    Bool(bool),
     // @todo: box members
     List(Vec<Expr>),
     Record(Vec<Vec<Expr>>),
