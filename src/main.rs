@@ -14,6 +14,9 @@ fn main() {
 
         let t = true
         let f = false
+
+        let r = 2..3
+        let s = i..n
     "#;
 
     match intrinsic_parser::program(source) {

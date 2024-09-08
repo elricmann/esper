@@ -14,10 +14,15 @@ parser! {
 
     rule integer_literal() -> Expr
       = n:$(['0'..='9']+) { Expr::Int(n.parse().unwrap()) }
-    
+
     rule bool_literal() -> Expr
       = "true" { Expr::Bool(true) }
       / "false" { Expr::Bool(false) }
+
+    rule range_expr() -> Expr
+      = start:(integer_literal() / identifier_expr()) ".." end:(integer_literal() / identifier_expr()) {
+          Expr::Range(Box::new(start), Box::new(end))
+      }
 
     rule let_binding() -> Expr
       = "let" _ id:identifier() _ "=" _ expr:expr() { Expr::Let(id.into(), Box::new(expr)) }
@@ -30,7 +35,7 @@ parser! {
 
     // assign must hold the highest precedence
     rule primary() -> Expr
-      = assign() / paren_expr() / if_expr() / fn_expr() / let_binding() / bool_literal() / integer_literal() /
+      = assign() / paren_expr() / range_expr() / if_expr() / fn_expr() / let_binding() / bool_literal() / integer_literal() /
         identifier_expr() / list() / record()
 
     rule expr() -> Expr
@@ -113,7 +118,7 @@ parser! {
     //   = _ first:expr() _ "in" { first }
 
     rule exprs_list() -> Vec<Expr>
-      = first:expr() rest:(expr())* {
+      = first:(expr() / primary()) newline()? rest:(expr() / primary())* {
         let mut exprs = vec![first];
         exprs.extend(rest);
         exprs
@@ -134,6 +139,7 @@ pub enum Expr {
     // @todo: box members
     List(Vec<Expr>),
     Record(Vec<Vec<Expr>>),
+    Range(Box<Expr>, Box<Expr>),
     Bin(Box<Expr>, BinOp, Box<Expr>),
     // @fix: precedence of >= <=
     Compare(Box<Expr>, CompareOp, Box<Expr>),
