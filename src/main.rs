@@ -35,6 +35,16 @@ fn main() {
         (-2.9)
         7
         (-8)
+
+        let v : 0 = 0
+        let n : int = 1
+        let p : | bool | float = 0.0
+
+        type a = b end
+        type c =
+          | d
+          | e
+        end
     "#;
 
     match intrinsic_parser::program(source) {

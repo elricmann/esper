@@ -2,6 +2,32 @@ use peg::parser;
 
 parser! {
   pub grammar intrinsic_parser() for str {
+    rule typed_expr() -> Expr
+      = typed_literal() / typed_symbol() / typed_variant()
+
+    rule typed_literal() -> Expr
+      = ty:(integer_literal() / float_literal() / bool_literal())
+        { Expr::TypedLiteral(ty.into()) }
+
+    rule typed_symbol() -> Expr
+      = id:identifier() { Expr::TypedSymbol(id.into()) }
+
+    rule type_alias() -> Expr
+      = "type" _ id:identifier() _ "=" _ type_expr:typed_expr() _ "end" {
+      Expr::TypeAlias(id.into(), Box::new(type_expr))
+    }
+
+    rule typed_variant() -> Expr
+      = "|" _ first:typed_expr() _ "|"  _ rest:(typed_expr())* {
+        let mut expr = first;
+
+        for variant in rest {
+            expr = Expr::TypedVariant(Box::new(expr), Box::new(variant));
+        }
+
+        expr
+    }
+
     rule _() = whitespace()?
 
     rule newline() = quiet!{ ['\n' | '\r']+ }
@@ -39,7 +65,9 @@ parser! {
       / "false" { Expr::Bool(false) }
 
     rule range_expr() -> Expr
-      = start:(integer_literal() / identifier_expr()) ".." end:(integer_literal() / identifier_expr()) {
+      = start:(integer_literal() / identifier_expr())
+        ".."
+        end:(integer_literal() / identifier_expr()) {
           Expr::Range(Box::new(start), Box::new(end))
       }
 
@@ -61,6 +89,9 @@ parser! {
 
     rule let_binding() -> Expr
       = "let" _ id:identifier() _ "=" _ expr:expr() { Expr::Let(id.into(), Box::new(expr)) }
+      / "let" _ id:identifier() _ ":" _ ty:typed_expr() _ "=" _ expr:expr() {
+        Expr::TypedLet(id.into(), Box::new(ty), Box::new(expr))
+      }
 
     rule assignable() -> Expr
       = id:identifier_expr() { id }
@@ -70,8 +101,9 @@ parser! {
 
     // assign must hold the highest precedence
     rule primary() -> Expr
-      = assign() / paren_expr() / call_expr() / member_expr() / range_expr() / loop_expr() / if_expr() / fn_expr() / let_binding() / bool_literal() / float_literal() / integer_literal() /
-        identifier_expr() / list() / record()
+      = assign() / paren_expr() / type_alias() / call_expr() / member_expr() / range_expr() / loop_expr() /
+        if_expr() / fn_expr() / let_binding() / bool_literal() / float_literal() /
+        integer_literal() / identifier_expr() / list() / record()
 
     rule expr() -> Expr
       = add_sub() / compare() / primary()
@@ -189,6 +221,11 @@ pub enum Expr {
     Fn(Vec<String>, Vec<Expr>),
     Member(Box<Expr>, Box<Expr>),
     Call(Box<Expr>, Vec<Expr>),
+    TypedSymbol(String),
+    TypedLiteral(Box<Expr>),
+    TypedVariant(Box<Expr>, Box<Expr>),
+    TypedLet(String, Box<Expr>, Box<Expr>),
+    TypeAlias(String, Box<Expr>),
 }
 
 #[derive(Debug, Clone, PartialEq)]
