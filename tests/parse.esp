@@ -82,3 +82,9 @@ let c = 'c'
 (*
  * ignored
  * multiline comment *)
+
+@abc let n = 0                         (* ident directive + let binding *)
+@abc(p = q, true) struct A end         (* call directive + struct expr *)
+let k = @abc 2 - 3                     (* assignable, applies to LHS *)
+let p = @abc (2 - 3)                   (* assignable, applies to parens *)
+@abc @def || 0 end                     (* nested directives, wrap RHS *)

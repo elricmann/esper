@@ -84,6 +84,11 @@ parser! {
       Expr::Char(value.chars().next().unwrap())
     }
 
+    rule directive_expr() -> Expr
+      = "@" _ directive:(call_expr() / identifier_expr()) _ expr:primary() {
+      Expr::Directive(Box::new(directive), Box::new(expr))
+    }
+
     rule range_expr() -> Expr
       = start:(integer_literal() / identifier_expr())
         ".."
@@ -124,7 +129,7 @@ parser! {
 
     // assign must hold the highest precedence
     rule primary() -> Expr
-      = assign() / paren_expr() / struct_expr() / type_alias() / call_expr() / member_expr() /
+      = assign() / paren_expr() / directive_expr() / struct_expr() / type_alias() / call_expr() / member_expr() /
         range_expr() / loop_expr() / if_expr() / fn_expr() / let_binding() / bool_literal() /
         float_literal() / integer_literal() / string_literal() / char_literal() /
         identifier_expr() / list() / record()
@@ -253,6 +258,7 @@ pub enum Expr {
     List(Vec<Expr>),
     Record(Vec<Vec<Expr>>),
     Range(Box<Expr>, Box<Expr>),
+    Directive(Box<Expr>, Box<Expr>),
     Bin(Box<Expr>, BinOp, Box<Expr>),
     // @fix: precedence of >= <=
     Compare(Box<Expr>, CompareOp, Box<Expr>),
