@@ -63,7 +63,14 @@ impl EmitDefault {
                 match value.as_ref() {
                     Expr::Fn(params, body) => {
                         ctx.emit("");
-                        let params_str = params.join(", ");
+                        let params_str = params
+                            .iter()
+                            .map(|(param, ty)| match ty {
+                                Some(ty) => format!("{} {}", self.emit_type(ty), param),
+                                None => param.clone(),
+                            })
+                            .collect::<Vec<_>>()
+                            .join(", ");
 
                         ctx.emit(&format!("{}auto {}({}) {{", indent, var, params_str));
                         ctx.level += 2;
@@ -100,7 +107,14 @@ impl EmitDefault {
                 match value.as_ref() {
                     Expr::Fn(params, body) => {
                         ctx.emit("");
-                        let params_str = params.join(", ");
+                        let params_str = params
+                            .iter()
+                            .map(|(param, ty)| match ty {
+                                Some(ty) => format!("{} {}", self.emit_type(ty), param),
+                                None => param.clone(),
+                            })
+                            .collect::<Vec<_>>()
+                            .join(", ");
                         let return_type = self.emit_type(ty);
 
                         ctx.emit(&format!(

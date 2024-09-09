@@ -227,9 +227,22 @@ parser! {
         Expr::Loop(Box::new(loop_var), Box::new(iter), body)
     }
 
+    // rule fn_expr() -> Expr
+    //   = "|" _ args:(identifier() ** (_ "," _)) _ "|" _ body:body_expr() _ "end" {
+    //   Expr::Fn(args.into_iter().map(|arg| arg.into()).collect(), body)
+    // }
+
     rule fn_expr() -> Expr
-      = "|" _ args:(identifier() ** (_ "," _)) _ "|" _ body:body_expr() _ "end" {
-      Expr::Fn(args.into_iter().map(|arg| arg.into()).collect(), body)
+    = "|" _ args:(fn_arg() ** (_ "," _)) _ "|" _ body:body_expr() _ "end" {
+      Expr::Fn(args, body)
+    }
+
+    rule fn_arg() -> (String, Option<Expr>)
+    = id:identifier() _ ":" _ ty:typed_expr() {
+        (id.into(), Some(ty))
+    }
+    / id:identifier() {
+        (id.into(), None)
     }
 
     rule body_expr() -> Vec<Expr>
@@ -274,7 +287,7 @@ pub enum Expr {
     Compare(Box<Expr>, CompareOp, Box<Expr>),
     If(Box<Expr>, Vec<Expr>, Option<Vec<Expr>>),
     Loop(Box<Expr>, Box<Expr>, Vec<Expr>),
-    Fn(Vec<String>, Vec<Expr>),
+    Fn(Vec<(String, Option<Expr>)>, Vec<Expr>),
     Member(Vec<Expr>),
     Call(Box<Expr>, Vec<Expr>),
     Struct(String, Vec<(String, Expr)>),
