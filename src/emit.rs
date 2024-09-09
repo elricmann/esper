@@ -186,18 +186,6 @@ impl EmitDefault {
                 ));
             }
 
-            Expr::Call(callee, args) => {
-                let indent = ctx.indent();
-                let callee_str = self.emit_value(callee);
-                let args_str = args
-                    .iter()
-                    .map(|arg| self.emit_value(arg))
-                    .collect::<Vec<_>>()
-                    .join(", ");
-
-                ctx.emit(&format!("{}{}({});", indent, callee_str, args_str));
-            }
-
             Expr::If(cond, then_body, else_body) => {
                 let cond_str = self.emit_value(cond);
                 let indent = ctx.indent();
@@ -271,6 +259,40 @@ impl EmitDefault {
                 };
 
                 format!("({} {} {})", lhs_str, op_str, rhs_str)
+            }
+
+            Expr::Call(callee, args) => {
+                let callee_str = self.emit_value(callee);
+                let args_str = args
+                    .iter()
+                    .map(|arg| self.emit_value(arg))
+                    .collect::<Vec<_>>()
+                    .join(", ");
+
+                return (format!("{}({})", callee_str, args_str));
+            }
+
+            Expr::TypedCall(callee, generics, args) => {
+                let callee_str = self.emit_value(callee);
+
+                let generics_str = if !generics.is_empty() {
+                    let generics_ty_str = generics
+                        .iter()
+                        .map(|gen| self.emit_type(gen))
+                        .collect::<Vec<_>>()
+                        .join(", ");
+                    format!("<{}>", generics_ty_str)
+                } else {
+                    String::new()
+                };
+
+                let args_str = args
+                    .iter()
+                    .map(|arg| self.emit_value(arg))
+                    .collect::<Vec<_>>()
+                    .join(", ");
+
+                return format!("{}{}({})", callee_str, generics_str, args_str);
             }
 
             _ => String::new(),

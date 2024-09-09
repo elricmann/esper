@@ -28,5 +28,9 @@ let k = ||
     false
   end;
 
+  fn<T>();
+
   let x = a - b
 end
+
+let lst = vector<int>()
