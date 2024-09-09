@@ -207,12 +207,12 @@ parser! {
     }
 
     rule fn_expr() -> Expr
-      = "|" _ args:(identifier() ** (_ "," _)) _ "|" _ body:(expr() ** (_ "," _)) _ "end" {
+      = "|" _ args:(identifier() ** (_ "," _)) _ "|" _ body:body_expr() _ "end" {
       Expr::Fn(args.into_iter().map(|arg| arg.into()).collect(), body)
     }
 
-    rule body_expr() -> Expr
-      = newline() e:expr() newline() { e }
+    rule body_expr() -> Vec<Expr>
+      = expr() ** (_ ";" _)
 
     rule exprs_list() -> Vec<Expr>
       = first:(expr() / primary()) newline()? rest:(expr() / primary())* {

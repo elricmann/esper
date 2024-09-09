@@ -9,7 +9,8 @@ fn main() {
         let add = |a, b| a + b end
 
         let m = |a, b|
-          b = a
+          c = a;
+          c = k
         end
 
         let t = true
@@ -60,10 +61,15 @@ fn main() {
 
         struct C
           d : float,
-          e : || d + d end
+          e : ||
+            d + d
+          end
         end
 
-        let a = || 2, 3 end
+        let a = ||
+          b = k;
+          k = true
+        end
     "#;
 
     match intrinsic_parser::program(source) {
