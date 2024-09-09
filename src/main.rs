@@ -60,8 +60,10 @@ fn main() {
 
         struct C
           d : float,
-          e : || self.d + self.d end
+          e : || d + d end
         end
+
+        let a = || 2, 3 end
     "#;
 
     match intrinsic_parser::program(source) {
