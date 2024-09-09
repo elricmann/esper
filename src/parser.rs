@@ -1,7 +1,7 @@
 use peg::parser;
 
 parser! {
-  pub grammar intrinsic_parser() for str {
+  pub grammar esper_parser() for str {
     rule typed_expr() -> Expr
       = typed_literal() / typed_symbol() / typed_variant()
 

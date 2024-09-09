@@ -2,7 +2,7 @@
 
 mod parser;
 
-use crate::parser::intrinsic_parser;
+use crate::parser::esper_parser;
 
 fn main() {
     let source = r#"
@@ -72,7 +72,7 @@ fn main() {
         end
     "#;
 
-    match intrinsic_parser::program(source) {
+    match esper_parser::program(source) {
         Ok(program) => {
             dbg!(program);
         }
