@@ -79,6 +79,18 @@ impl EmitDefault {
                 ));
             }
 
+            Expr::Call(callee, args) => {
+                let indent = ctx.indent();
+                let callee_str = self.emit_value(callee);
+                let args_str = args
+                    .iter()
+                    .map(|arg| self.emit_value(arg))
+                    .collect::<Vec<_>>()
+                    .join(", ");
+
+                ctx.emit(&format!("{}{}({});", indent, callee_str, args_str));
+            }
+
             _ => {
                 ctx.emit(&self.emit_value(expr));
             }
