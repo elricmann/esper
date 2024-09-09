@@ -268,6 +268,18 @@ impl EmitDefault {
                 format!("std::ranges::views::iota({},{})", lhs_str, rhs_str)
             }
 
+            // RHS can assume the LHS casts the C++ initializer lists
+            // or ideally use vector<T>() as an extended definition
+            Expr::List(exprs) => {
+                let elements = exprs
+                    .iter()
+                    .map(|e| self.emit_value(e))
+                    .collect::<Vec<_>>()
+                    .join(", ");
+
+                format!("{{{}}}", elements)
+            }
+
             Expr::Call(callee, args) => {
                 let callee_str = self.emit_value(callee);
                 let args_str = args

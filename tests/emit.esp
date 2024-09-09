@@ -36,3 +36,5 @@ end
 let lst = vector<int>()
 
 let rng = 2..3
+
+let v = [9, 6, 3]
