@@ -13,8 +13,16 @@ let s = i..n
 
 if a > 2 then true else false end
 
+let k = if a > 2 then
+  s = r;
+  true
+else
+  false
+end
+
 loop i in 2..3
-  i * 2
+  i * 2;
+  2 * i
 end
 
 let a = b.c
@@ -53,9 +61,7 @@ end
 
 struct C
   d : float,
-  e : ||
-    d + d
-  end
+  e : || d + d end
 end
 
 let a = ||

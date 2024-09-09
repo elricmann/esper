@@ -205,15 +205,15 @@ parser! {
     } / primary()
 
     rule if_expr() -> Expr
-      = "if" _ cond:expr() _ "then" _ then_body:exprs_list() _ "end" {
+      = "if" _ cond:expr() _ "then" _ then_body:body_expr() _ "end" {
       Expr::If(Box::new(cond), then_body, None)
     }
-      / "if" _ cond:expr() _ "then" _ then_body:exprs_list() _ "else" _ else_body:exprs_list() _ "end" {
+      / "if" _ cond:expr() _ "then" _ then_body:body_expr() _ "else" _ else_body:body_expr() _ "end" {
       Expr::If(Box::new(cond), then_body, Some(else_body))
     }
 
     rule loop_expr() -> Expr
-      = "loop" _ loop_var:expr() _ "in" _ iter:primary() _ body:exprs_list() _ "end" {
+      = "loop" _ loop_var:expr() _ "in" _ iter:primary() _ body:body_expr() _ "end" {
         Expr::Loop(Box::new(loop_var), Box::new(iter), body)
     }
 
