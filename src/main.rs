@@ -14,8 +14,8 @@ fn main() {
         Ok(program) => {
             dbg!(&program);
             let out = EmitDefault {};
-            let out = out.emit_program(&program);
-            dbg!(out);
+            let out = out.emit_program(&program, "test".into());
+            println!("{}", out);
         }
 
         Err(err) => {
