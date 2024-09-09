@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
 mod parser;
+mod visit;
 
 use crate::parser::esper_parser;
 
