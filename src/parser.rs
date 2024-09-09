@@ -72,6 +72,16 @@ parser! {
       = "true" { Expr::Bool(true) }
       / "false" { Expr::Bool(false) }
 
+    rule string_literal() -> Expr
+      = "\"" value:$([^ '"' ]*) "\"" {
+      Expr::String(value.into())
+    }
+
+    rule char_literal() -> Expr
+      = "'" value:$([^ '\'' ]) "'" {
+      Expr::Char(value.chars().next().unwrap())
+    }
+
     rule range_expr() -> Expr
       = start:(integer_literal() / identifier_expr())
         ".."
@@ -112,9 +122,10 @@ parser! {
 
     // assign must hold the highest precedence
     rule primary() -> Expr
-      = assign() / paren_expr() / struct_expr() / type_alias() / call_expr() / member_expr() / range_expr() / loop_expr() /
-        if_expr() / fn_expr() / let_binding() / bool_literal() / float_literal() /
-        integer_literal() / identifier_expr() / list() / record()
+      = assign() / paren_expr() / struct_expr() / type_alias() / call_expr() / member_expr() /
+        range_expr() / loop_expr() / if_expr() / fn_expr() / let_binding() / bool_literal() /
+        float_literal() / integer_literal() / string_literal() / char_literal() /
+        identifier_expr() / list() / record()
 
     rule expr() -> Expr
       = add_sub() / compare() / primary()
@@ -234,6 +245,8 @@ pub enum Expr {
     Int(i64),
     Float(f64),
     Bool(bool),
+    Char(char),
+    String(String),
     // @todo: box members
     List(Vec<Expr>),
     Record(Vec<Vec<Expr>>),
