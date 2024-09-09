@@ -124,7 +124,7 @@ parser! {
       }
 
     rule assignable() -> Expr
-      = id:identifier_expr() { id }
+      = member_expr() / identifier_expr()
 
     rule assign() -> Expr
       = lhs:assignable() _ "=" _ rhs:expr() { Expr::Assign(Box::new(lhs), Box::new(rhs)) }

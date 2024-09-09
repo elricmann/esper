@@ -235,6 +235,8 @@ impl EmitDefault {
             Expr::String(s) => format!("\"{}\"", s),
             Expr::Var(var_name) => var_name.clone(),
 
+            Expr::Member(exprs) => self.emit_member(exprs),
+
             Expr::Bin(lhs, op, rhs) => {
                 let lhs_str = self.emit_value(lhs);
                 let rhs_str = self.emit_value(rhs);
@@ -316,6 +318,14 @@ impl EmitDefault {
 
             _ => String::new(),
         }
+    }
+
+    fn emit_member(&self, exprs: &[Expr]) -> String {
+        exprs
+            .iter()
+            .map(|e| self.emit_value(e))
+            .collect::<Vec<_>>()
+            .join(".")
     }
 
     fn emit_type(&self, ty: &Expr) -> String {

@@ -34,7 +34,10 @@ let k = ||
 end
 
 let lst = vector<int>()
-
 let rng = 2..3
-
 let v = [9, 6, 3]
+
+p.q. = 3
+p.q.r. = 4
+(* @fix: method calls *)
+p.q.r()
