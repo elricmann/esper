@@ -1,12 +1,13 @@
-#![allow(dead_code)]
+#![allow(warnings, dead_code)]
 
+mod emit;
 mod parser;
 mod visit;
 
 use crate::parser::esper_parser;
 
 fn main() {
-    let source = include_str!("../tests/parse.esp");
+    let source = include_str!("../tests/emit.esp");
 
     match esper_parser::program(source) {
         Ok(program) => {

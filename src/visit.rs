@@ -14,6 +14,11 @@ pub trait Visitor {
     );
 }
 
+// we will only visit expressions that branch or wrap
+// expressions in the variant definitions, the callback
+// won't be return based so EmitContextImpl should allow
+// emitting from the callback into different outputs
+
 impl Visitor for Expr {
     fn visit(
         &self,
@@ -65,9 +70,11 @@ impl Visitor for Expr {
 
             Expr::If(cond, then_body, else_body) => {
                 cond.visit(ctx, callback);
+
                 for expr in then_body {
                     expr.visit(ctx, callback);
                 }
+
                 if let Some(else_body) = else_body {
                     for expr in else_body {
                         expr.visit(ctx, callback);
@@ -78,6 +85,7 @@ impl Visitor for Expr {
             Expr::Loop(var, iter, body) => {
                 var.visit(ctx, callback);
                 iter.visit(ctx, callback);
+
                 for expr in body {
                     expr.visit(ctx, callback);
                 }
@@ -97,6 +105,7 @@ impl Visitor for Expr {
 
             Expr::Call(callee, args) => {
                 callee.visit(ctx, callback);
+
                 for arg in args {
                     arg.visit(ctx, callback);
                 }
