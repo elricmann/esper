@@ -4,6 +4,7 @@ mod emit;
 mod parser;
 mod visit;
 
+use crate::emit::EmitDefault;
 use crate::parser::esper_parser;
 
 fn main() {
@@ -11,7 +12,11 @@ fn main() {
 
     match esper_parser::program(source) {
         Ok(program) => {
-            dbg!(program);
+            dbg!(&program);
+
+            let out = EmitDefault {};
+            let out = out.emit_program(&program);
+            dbg!(out);
         }
 
         Err(err) => {

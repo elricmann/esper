@@ -28,6 +28,12 @@ impl Visitor for Expr {
         callback(ctx, self);
 
         match self {
+            Expr::Program(exprs) => {
+                for expr in exprs {
+                    expr.visit(ctx, callback);
+                }
+            }
+
             Expr::Let(_, expr) => expr.visit(ctx, callback),
 
             Expr::Assign(lhs, rhs) => {

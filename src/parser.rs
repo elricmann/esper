@@ -242,13 +242,20 @@ parser! {
         exprs
     }
 
-    pub rule program() -> Vec<Expr>
-      = _ exprs:(expr() ** _) _ { exprs }
+    pub rule program() -> Expr
+      = _ exprs:(expr() ** _) _ {
+        let boxed_exprs = exprs
+          .into_iter()
+          .map(|e| Box::new(e) as Box<Expr>)
+          .collect::<Vec<Box<Expr>>>();
+        Expr::Program(boxed_exprs)
+    }
   }
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Expr {
+    Program(Vec<Box<Expr>>),
     Let(String, Box<Expr>),
     Assign(Box<Expr>, Box<Expr>),
     Var(String),
