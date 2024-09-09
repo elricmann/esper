@@ -1,10 +1,26 @@
 use crate::parser::{BinOp, CompareOp, Expr};
 use crate::visit::{EsperContext, Visitor};
 
+// note: esper outputs with some non-practical patterns:
+// 1 - where GLIBXX is not defined or not in /usr/include/c++, we conditionally
+//     include libstdc++ headers since we will only be compiling with clang++
+// 2 - using namespace std is forced since the :: operator is reserved (lst slice)
+// 3 - public class member definitions (leaky abstractions) is forced
+// 4 - C++ initializer list for RHS list-like expressions
+
+// @todo:
+// 1 - type decls/alias for various
+// 2 - member expr with trailing/leading callable
+// 3 - constructors & destructors, copy constructor & move semantics
+// 4 - refs & derefs for raw values and directives for smart ptrs
+// 5 - operator overloading (maybe?)
+
+#[derive(Debug, Clone)]
 pub struct EmitContextImpl {
     pub level: usize,
     pub output: String,
     pub module: String,
+    pub use_glibcxx: bool,
 }
 
 impl EmitContextImpl {
@@ -13,6 +29,7 @@ impl EmitContextImpl {
             level: 0,
             output: String::new(),
             module: String::new(),
+            use_glibcxx: false,
         }
     }
 
@@ -32,11 +49,15 @@ impl EsperContext for EmitContextImpl {
     }
 }
 
-pub struct EmitDefault;
+#[derive(Debug, Clone)]
+pub struct EmitDefault {
+    pub ctx: EmitContextImpl,
+}
 
 impl EmitDefault {
-    pub fn emit_program(&self, expr: &Expr, module_id: &str) -> String {
-        let mut ctx = EmitContextImpl::new();
+    pub fn emit_program(&mut self, expr: &Expr, module_id: &str) -> String {
+        let mut ctx = self.ctx.clone();
+
         ctx.module = module_id.into();
         self.emit_expr(&mut ctx, expr);
         ctx.output
@@ -45,6 +66,11 @@ impl EmitDefault {
     pub fn emit_expr(&self, ctx: &mut EmitContextImpl, expr: &Expr) {
         match expr {
             Expr::Program(exprs) => {
+                if ctx.use_glibcxx {
+                    ctx.emit(include_str!("../lib/stdc++.h"));
+                }
+
+                ctx.emit("using namespace std;\n");
                 ctx.emit(&format!("namespace {} {{", ctx.module));
                 // ctx.level = 2;
                 // ctx.emit("");

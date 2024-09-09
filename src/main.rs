@@ -4,6 +4,8 @@ mod emit;
 mod parser;
 mod visit;
 
+use emit::EmitContextImpl;
+
 use crate::emit::EmitDefault;
 use crate::parser::esper_parser;
 
@@ -13,7 +15,9 @@ fn main() {
     match esper_parser::program(source) {
         Ok(program) => {
             dbg!(&program);
-            let out = EmitDefault {};
+            let mut ctx = EmitContextImpl::new();
+            ctx.use_glibcxx = true;
+            let mut out = EmitDefault { ctx };
             let out = out.emit_program(&program, "test".into());
             println!("{}", out);
         }
