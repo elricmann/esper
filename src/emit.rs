@@ -1,4 +1,4 @@
-use crate::parser::Expr;
+use crate::parser::{BinOp, CompareOp, Expr};
 use crate::visit::{EsperContext, Visitor};
 
 pub struct EmitContextImpl {
@@ -195,6 +195,33 @@ impl EmitDefault {
             Expr::Char(c) => format!("'{}'", c),
             Expr::String(s) => format!("\"{}\"", s),
             Expr::Var(var_name) => var_name.clone(),
+
+            Expr::Bin(lhs, op, rhs) => {
+                let lhs_str = self.emit_value(lhs);
+                let rhs_str = self.emit_value(rhs);
+                let op_str = match op {
+                    BinOp::Add => "+",
+                    BinOp::Sub => "-",
+                    BinOp::Mul => "*",
+                    BinOp::Div => "/",
+                };
+
+                format!("({} {} {})", lhs_str, op_str, rhs_str)
+            }
+
+            Expr::Compare(lhs, op, rhs) => {
+                let lhs_str = self.emit_value(lhs);
+                let rhs_str = self.emit_value(rhs);
+                let op_str = match op {
+                    CompareOp::Gt => ">",
+                    CompareOp::Lt => "<",
+                    CompareOp::Gte => ">=",
+                    CompareOp::Lte => "<=",
+                };
+
+                format!("({} {} {})", lhs_str, op_str, rhs_str)
+            }
+
             _ => String::new(),
         }
     }

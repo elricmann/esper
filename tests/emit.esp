@@ -17,4 +17,4 @@ let b = |c, d| 2; c end
 
 let o: float = 0.0
 let r: 0 = 0
-let add: int = |a: int, b: int| a end
+let add: int = |a: int, b: int| a + b end
