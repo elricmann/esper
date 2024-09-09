@@ -64,6 +64,7 @@ impl EmitDefault {
                     Expr::Fn(params, body) => {
                         ctx.emit("");
                         let params_str = params.join(", ");
+
                         ctx.emit(&format!("{}auto {}({}) {{", indent, var, params_str));
                         ctx.level += 2;
 
@@ -86,6 +87,49 @@ impl EmitDefault {
                         ctx.emit(&format!(
                             "{}auto {} = {};",
                             indent,
+                            var,
+                            self.emit_value(value)
+                        ));
+                    }
+                }
+            }
+
+            Expr::TypedLet(var, ty, value) => {
+                let indent = ctx.indent();
+
+                match value.as_ref() {
+                    Expr::Fn(params, body) => {
+                        ctx.emit("");
+                        let params_str = params.join(", ");
+                        let return_type = self.emit_type(ty);
+
+                        ctx.emit(&format!(
+                            "{}{} {}({}) {{",
+                            indent, return_type, var, params_str
+                        ));
+                        ctx.level += 2;
+
+                        let last = body.last();
+                        let body: &Vec<Expr> = &body[0..body.len() - 1].into();
+
+                        for expr in body {
+                            self.emit_expr(ctx, expr);
+                        }
+
+                        if let Some(last) = last {
+                            let indent = ctx.indent();
+                            ctx.emit(&format!("{}return {};", indent, self.emit_value(last)));
+                        }
+
+                        ctx.level -= 2;
+                        ctx.emit(&format!("{}}}", indent));
+                    }
+                    _ => {
+                        let ty_str = self.emit_type(ty);
+                        ctx.emit(&format!(
+                            "{}{} {} = {};",
+                            indent,
+                            ty_str,
                             var,
                             self.emit_value(value)
                         ));
@@ -137,6 +181,16 @@ impl EmitDefault {
             Expr::Char(c) => format!("'{}'", c),
             Expr::String(s) => format!("\"{}\"", s),
             Expr::Var(var_name) => var_name.clone(),
+            _ => String::new(),
+        }
+    }
+
+    fn emit_type(&self, ty: &Expr) -> String {
+        match ty {
+            Expr::TypedSymbol(type_name) => type_name.clone(),
+            Expr::TypedLiteral(type_name) => {
+                format!("decltype({})", self.emit_value(type_name))
+            }
             _ => String::new(),
         }
     }

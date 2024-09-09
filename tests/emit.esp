@@ -14,3 +14,7 @@ let a = ||
 end
 
 let b = |c, d| 2; c end
+
+let o: float = 0.0
+let r: 0 = 0
+let add: int = |a, b| a end
