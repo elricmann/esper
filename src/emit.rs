@@ -229,10 +229,28 @@ impl EmitDefault {
     fn emit_type(&self, ty: &Expr) -> String {
         match ty {
             Expr::TypedSymbol(type_name) => type_name.clone(),
+            Expr::TypedVariant(lhs, rhs) => self.emit_variant(lhs, rhs),
             Expr::TypedLiteral(type_name) => {
                 format!("decltype({})", self.emit_value(type_name))
             }
             _ => String::new(),
+        }
+    }
+
+    fn emit_variant(&self, lhs: &Expr, rhs: &Expr) -> String {
+        let lhs_str = self.emit_type(lhs);
+
+        match rhs {
+            // match against RHS typed variants which is the nesting form
+            // based on the parsing rule, expecting a LHS and RHS
+            Expr::TypedVariant(next_lhs, next_rhs) => {
+                let rhs_str = self.emit_variant(next_lhs, next_rhs);
+                format!("{} | {}", lhs_str, rhs_str)
+            }
+            _ => {
+                let rhs_str = self.emit_type(rhs);
+                format!("std::variant<{} | {}>", lhs_str, rhs_str)
+            }
         }
     }
 }
