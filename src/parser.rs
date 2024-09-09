@@ -36,11 +36,13 @@ parser! {
         expr
     }
 
-    rule _() = whitespace()?
+    rule _() = (whitespace() / comment())*
 
     rule newline() = quiet!{ ['\n' | '\r']+ }
 
     rule whitespace() = quiet!{[' ' | '\t' | '\n' | '\r']+}
+
+    rule comment() = "(*" (!"*)" [_])* "*)"
 
     rule identifier() -> &'input str
       = quiet!{s:$(['a'..='z' | 'A'..='Z' | '_']+)} / expected!("identifier")

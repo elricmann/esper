@@ -5,6 +5,9 @@ let m = |a, b|
   c = k
 end
 
+let a = [2, 4, 6]
+let a = { p : 1, 2 : k }
+
 let t = true
 let f = false
 
@@ -64,7 +67,7 @@ struct C
   e : || d + d end
 end
 
-let a = ||
+let (*p*) a = ||
   b = k;
   k = true
 end
@@ -73,3 +76,9 @@ let p = "string value"
 let q = "string delimiters \n a \t b \r c"
 
 let c = 'c'
+
+(* comment *)
+(* ignored comment *)
+(*
+ * ignored
+ * multiline comment *)
