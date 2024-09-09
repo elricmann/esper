@@ -45,14 +45,16 @@ impl EmitDefault {
     pub fn emit_expr(&self, ctx: &mut EmitContextImpl, expr: &Expr) {
         match expr {
             Expr::Program(exprs) => {
-                ctx.emit(&format!("class {} {{", ctx.module));
-                ctx.level = 2;
+                ctx.emit(&format!("namespace {} {{", ctx.module));
+                // ctx.level = 2;
+                // ctx.emit("");
 
                 for sub_expr in exprs {
                     self.emit_expr(ctx, sub_expr);
                 }
 
-                ctx.emit(&format!("}}"));
+                // ctx.emit("");
+                ctx.emit(&format!("}} // namespace {}", ctx.module));
             }
 
             Expr::Let(var, value) => {
@@ -63,6 +65,17 @@ impl EmitDefault {
                     indent,
                     var,
                     self.emit_value(value)
+                ));
+            }
+
+            Expr::Assign(lhs, rhs) => {
+                let indent = ctx.indent();
+
+                ctx.emit(&format!(
+                    "{}{} = {};",
+                    indent,
+                    self.emit_value(lhs),
+                    self.emit_value(rhs)
                 ));
             }
 
