@@ -83,8 +83,20 @@ impl EmitDefault {
                         }
 
                         if let Some(last) = last {
-                            let indent = ctx.indent();
-                            ctx.emit(&format!("{}return {};", indent, self.emit_value(last)));
+                            if matches!(
+                                last,
+                                Expr::Int(_)
+                                    | Expr::Float(_)
+                                    | Expr::Bool(_)
+                                    | Expr::Char(_)
+                                    | Expr::String(_)
+                                    | Expr::Var(_)
+                                    | Expr::Bin(_, _, _)
+                                    | Expr::Compare(_, _, _)
+                            ) {
+                                let indent = ctx.indent();
+                                ctx.emit(&format!("{}return {};", indent, self.emit_value(last)));
+                            }
                         }
 
                         ctx.level -= 2;
@@ -131,8 +143,20 @@ impl EmitDefault {
                         }
 
                         if let Some(last) = last {
-                            let indent = ctx.indent();
-                            ctx.emit(&format!("{}return {};", indent, self.emit_value(last)));
+                            if matches!(
+                                last,
+                                Expr::Int(_)
+                                    | Expr::Float(_)
+                                    | Expr::Bool(_)
+                                    | Expr::Char(_)
+                                    | Expr::String(_)
+                                    | Expr::Var(_)
+                                    | Expr::Bin(_, _, _)
+                                    | Expr::Compare(_, _, _)
+                            ) {
+                                let indent = ctx.indent();
+                                ctx.emit(&format!("{}return {};", indent, self.emit_value(last)));
+                            }
                         }
 
                         ctx.level -= 2;
@@ -172,6 +196,33 @@ impl EmitDefault {
                     .join(", ");
 
                 ctx.emit(&format!("{}{}({});", indent, callee_str, args_str));
+            }
+
+            Expr::If(cond, then_body, else_body) => {
+                let cond_str = self.emit_value(cond);
+                let indent = ctx.indent();
+
+                ctx.emit(&format!("{}if ({}) {{", indent, cond_str));
+                ctx.level += 2;
+
+                for expr in then_body {
+                    self.emit_expr(ctx, expr);
+                }
+
+                ctx.level -= 2;
+                ctx.emit(&format!("{}}}", indent));
+
+                if let Some(else_body) = else_body {
+                    ctx.emit(&format!("{}else {{", indent));
+                    ctx.level += 2;
+
+                    for expr in else_body {
+                        self.emit_expr(ctx, expr);
+                    }
+
+                    ctx.level -= 2;
+                    ctx.emit(&format!("{}}}", indent));
+                }
             }
 
             _ => {
