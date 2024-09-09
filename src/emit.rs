@@ -213,6 +213,60 @@ impl EmitDefault {
                 }
             }
 
+            Expr::Struct(name, entries) => {
+                let indent = ctx.indent();
+                ctx.emit(&format!("\nclass {} {{", name));
+                ctx.emit("public:");
+                ctx.level += 2;
+
+                for (field_name, expr) in entries {
+                    match expr {
+                        Expr::TypedSymbol(_) | Expr::TypedLiteral(_) => {
+                            let indent = ctx.indent();
+                            let field_ty = self.emit_type(expr);
+
+                            ctx.emit(&format!("{}{} {};", indent, field_ty, field_name));
+                        }
+
+                        Expr::Fn(params, body) => {
+                            let indent = ctx.indent();
+                            let params_str = params
+                                .iter()
+                                .map(|(param, ty)| match ty {
+                                    Some(ty) => format!("{} {}", self.emit_type(ty), param),
+                                    None => param.clone(),
+                                })
+                                .collect::<Vec<_>>()
+                                .join(", ");
+
+                            // @todo: method return type
+
+                            ctx.emit(&format!("{}auto {}({}) {{", indent, field_name, params_str));
+                            ctx.level += 2;
+
+                            let last = body.last();
+                            let body: &Vec<Expr> = &body[0..body.len() - 1].into();
+
+                            for expr in body {
+                                self.emit_expr(ctx, expr);
+                            }
+
+                            if let Some(last) = last {
+                                let indent = ctx.indent();
+                                ctx.emit(&format!("{}return {};", indent, self.emit_value(last)));
+                            }
+
+                            ctx.level -= 2;
+                            ctx.emit(&format!("{}}}", indent));
+                        }
+                        _ => {}
+                    }
+                }
+
+                ctx.level -= 2;
+                ctx.emit(&format!("{}}};", indent));
+            }
+
             _ => {
                 let indent = ctx.indent();
                 ctx.emit(&format!("{}{};", indent, &self.emit_value(expr)));

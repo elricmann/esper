@@ -41,3 +41,10 @@ p.q. = 3
 p.q.r. = 4
 (* @fix: method calls *)
 p.q.r()
+
+struct A end
+
+struct B
+  c : int,
+  d : |a: int| a - c end
+end
