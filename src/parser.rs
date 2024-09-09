@@ -112,7 +112,7 @@ parser! {
 
     // assign must hold the highest precedence
     rule primary() -> Expr
-      = assign() / paren_expr() / type_alias() / call_expr() / member_expr() / range_expr() / loop_expr() /
+      = assign() / paren_expr() / struct_expr() / type_alias() / call_expr() / member_expr() / range_expr() / loop_expr() /
         if_expr() / fn_expr() / let_binding() / bool_literal() / float_literal() /
         integer_literal() / identifier_expr() / list() / record()
 
@@ -139,6 +139,20 @@ parser! {
       let kv_pairs = entries.into_iter().map(|(key, value)| vec![key, value]).collect();
 
       Expr::Record(kv_pairs)
+    }
+
+    rule struct_expr() -> Expr
+      = "struct" _ id:identifier() _ entries:(struct_entry() ** (_ "," _)) _ "end" {
+      let entries = entries.into_iter().collect();
+      Expr::Struct(id.into(), entries)
+    }
+
+    rule struct_entry() -> (String, Expr)
+    = prop:identifier() _ ":" _ type_:typed_expr() {
+      (prop.into(), type_)
+    }
+    / method:identifier() _ ":" _ fn_:fn_expr() {
+      (method.into(), fn_)
     }
 
     rule add_sub() -> Expr
@@ -232,6 +246,7 @@ pub enum Expr {
     Fn(Vec<String>, Vec<Expr>),
     Member(Box<Expr>, Box<Expr>),
     Call(Box<Expr>, Vec<Expr>),
+    Struct(String, Vec<(String, Expr)>),
     TypedSymbol(String),
     TypedLiteral(Box<Expr>),
     TypedVariant(Box<Expr>, Box<Expr>),

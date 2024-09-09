@@ -50,6 +50,18 @@ fn main() {
 
         a()
         b<c>()
+
+        struct A end
+
+        struct B
+          b : int,
+          _b : bool
+        end
+
+        struct C
+          d : float,
+          e : || self.d + self.d end
+        end
     "#;
 
     match intrinsic_parser::program(source) {
