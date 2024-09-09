@@ -97,18 +97,20 @@ parser! {
       }
 
     rule member_expr() -> Expr
-      = base:identifier_expr() "." rest:(ident:identifier_expr())+ {
-        let mut expr = base;
-
-        for ident in rest {
-            expr = Expr::Member(Box::new(expr), Box::new(ident));
-        }
-
-        expr
+    =
+    // base:identifier_expr() (_ "." _) rest:identifier_expr() {
+    //     let mut members = vec![base, rest];
+    //     Expr::Member(members)
+    //   }
+    // /
+    base:identifier_expr() (_ "." _) rest:(member_expr())* {
+        let mut members = vec![base];
+        members.extend(rest);
+        Expr::Member(members)
     }
 
     rule call_expr() -> Expr
-    = callee:(identifier_expr() / member_expr()) "(" _? args:(expr() ** (_ "," _)) _? ")" {
+    = callee:(fn_expr() / identifier_expr() / member_expr()) "(" _? args:(expr() ** (_ "," _)) _? ")" {
         Expr::Call(Box::new(callee), args)
       }
     / callee:(identifier_expr() / member_expr()) _ ty:type_generic() _ "(" _? args:(expr() ** (_ "," _)) _? ")" {
@@ -129,8 +131,9 @@ parser! {
 
     // assign must hold the highest precedence
     rule primary() -> Expr
-      = assign() / paren_expr() / directive_expr() / struct_expr() / type_alias() / call_expr() / member_expr() /
-        range_expr() / loop_expr() / if_expr() / fn_expr() / let_binding() / bool_literal() /
+      = assign() / paren_expr() / directive_expr() / struct_expr() / type_alias() / call_expr() /
+        range_expr() / member_expr() /
+        loop_expr() / if_expr() / fn_expr() / let_binding() / bool_literal() /
         float_literal() / integer_literal() / string_literal() / char_literal() /
         identifier_expr() / list() / record()
 
@@ -265,7 +268,7 @@ pub enum Expr {
     If(Box<Expr>, Vec<Expr>, Option<Vec<Expr>>),
     Loop(Box<Expr>, Box<Expr>, Vec<Expr>),
     Fn(Vec<String>, Vec<Expr>),
-    Member(Box<Expr>, Box<Expr>),
+    Member(Vec<Expr>),
     Call(Box<Expr>, Vec<Expr>),
     Struct(String, Vec<(String, Expr)>),
     TypedSymbol(String),

@@ -28,12 +28,8 @@ loop i in 2..3
   2 * i
 end
 
-let a = b.c
-
 a(2, 3, n + 1)
 let p = q(r..s, t..u)
-
-w(x.y)
 
 3.14159
 (-2.9)
@@ -88,3 +84,7 @@ let c = 'c'
 let k = @abc 2 - 3                     (* assignable, applies to LHS *)
 let p = @abc (2 - 3)                   (* assignable, applies to parens *)
 @abc @def || 0 end                     (* nested directives, wrap RHS *)
+
+p.q
+w(x.y.)
+p.q.r()
