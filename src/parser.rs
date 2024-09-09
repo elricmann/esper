@@ -91,8 +91,11 @@ parser! {
     }
 
     rule call_expr() -> Expr
-      = callee:(identifier_expr() / member_expr()) "(" _? args:(expr() ** (_ "," _)) _? ")" {
+    = callee:(identifier_expr() / member_expr()) "(" _? args:(expr() ** (_ "," _)) _? ")" {
         Expr::Call(Box::new(callee), args)
+      }
+    / callee:(identifier_expr() / member_expr()) _ ty:type_generic() _ "(" _? args:(expr() ** (_ "," _)) _? ")" {
+      Expr::TypedCall(Box::new(callee), ty, args)
     }
 
     rule let_binding() -> Expr
@@ -234,6 +237,7 @@ pub enum Expr {
     TypedVariant(Box<Expr>, Box<Expr>),
     TypedLet(String, Box<Expr>, Box<Expr>),
     TypeAlias(String, Vec<Expr>, Box<Expr>),
+    TypedCall(Box<Expr>, Vec<Expr>, Vec<Expr>),
 }
 
 #[derive(Debug, Clone, PartialEq)]

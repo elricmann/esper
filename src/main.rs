@@ -47,6 +47,9 @@ fn main() {
         end
 
         type f<g, h> = i end
+
+        a()
+        b<c>()
     "#;
 
     match intrinsic_parser::program(source) {
