@@ -261,6 +261,13 @@ impl EmitDefault {
                 format!("({} {} {})", lhs_str, op_str, rhs_str)
             }
 
+            Expr::Range(lhs, rhs) => {
+                let lhs_str = self.emit_value(lhs);
+                let rhs_str = self.emit_value(rhs);
+
+                format!("std::ranges::views::iota({},{})", lhs_str, rhs_str)
+            }
+
             Expr::Call(callee, args) => {
                 let callee_str = self.emit_value(callee);
                 let args_str = args

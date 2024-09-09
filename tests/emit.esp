@@ -34,3 +34,5 @@ let k = ||
 end
 
 let lst = vector<int>()
+
+let rng = 2..3
