@@ -35,6 +35,12 @@ impl EmitDefault {
 
     pub fn emit_expr(&self, ctx: &mut EmitContextImpl, expr: &Expr) {
         match expr {
+            Expr::Program(exprs) => {
+                for sub_expr in exprs {
+                    self.emit_expr(ctx, sub_expr);
+                }
+            }
+
             Expr::Let(var, value) => {
                 ctx.emit(&format!("auto {} = {};", var, self.emit_value(value)));
             }

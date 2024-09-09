@@ -13,7 +13,6 @@ fn main() {
     match esper_parser::program(source) {
         Ok(program) => {
             dbg!(&program);
-
             let out = EmitDefault {};
             let out = out.emit_program(&program);
             dbg!(out);
