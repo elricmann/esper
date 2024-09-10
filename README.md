@@ -13,7 +13,7 @@ This list is partially a feature matrix of existing features.
 
 ### Installation & usage
 
-_This is section is incomplete._
+_This section is incomplete._
 
 ### Quick Overview
 
@@ -130,4 +130,4 @@ _Required return type is the lvalue. Non-inferred parameter types. Last expressi
 
 ### License
 
-Copyright © MIT License & GPLv3 License. Esper is dual-licensed by source; however, if `EmitContextImpl::use_glibcxx` is enabled (default), it includes headers for `libstdc++`, which is GNU software.
+Copyright © MIT License & GPLv3 License. Esper is dual-licensed by source; however, for program outputs, if `EmitContextImpl::use_glibcxx` is enabled (default), it includes headers for `libstdc++`, which is GNU software.
