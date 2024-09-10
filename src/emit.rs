@@ -347,7 +347,7 @@ impl EmitDefault {
                 let lhs_str = self.emit_value(lhs);
                 let rhs_str = self.emit_value(rhs);
 
-                format!("std::ranges::views::iota({},{})", lhs_str, rhs_str)
+                format!("ranges::views::iota({},{})", lhs_str, rhs_str)
             }
 
             // RHS can assume the LHS casts the C++ initializer lists
@@ -431,7 +431,7 @@ impl EmitDefault {
             }
             _ => {
                 let rhs_str = self.emit_type(rhs);
-                format!("std::variant<{} | {}>", lhs_str, rhs_str)
+                format!("variant<{} | {}>", lhs_str, rhs_str)
             }
         }
     }
