@@ -17,7 +17,7 @@ parser! {
       = identifier_expr() / integer_literal()
 
     rule typed_record_entry() -> (Expr, Expr)
-      = key:typed_record_key() _ ":" _ value:expr() { (key, value) }
+      = key:typed_record_key() _ ":" _ value:typed_expr() { (key, value) }
 
     rule typed_record() -> Expr
       = "{" _ entries:(typed_record_entry() ** (_ "," _)) _ "}" {
