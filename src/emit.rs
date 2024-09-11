@@ -328,6 +328,31 @@ impl EmitDefault {
                 ctx.emit(&format!("{}}};", indent));
             }
 
+            Expr::TypeAlias(name, ty_params, rhs) => {
+                let indent = ctx.indent();
+
+                let template_str = if ty_params.is_empty() {
+                    String::new()
+                } else {
+                    let ty_params_str = ty_params
+                        .iter()
+                        .map(|ty| format!("typename {}", self.emit_type(ty)))
+                        .collect::<Vec<_>>()
+                        .join(", ");
+                    format!("template<{}> ", ty_params_str)
+                };
+
+                match rhs.as_ref() {
+                    Expr::TypedSymbol(ty) => {
+                        ctx.emit(&format!(
+                            "{}{}using {} = {};",
+                            indent, template_str, name, ty
+                        ));
+                    }
+                    _ => {}
+                }
+            }
+
             _ => {
                 let indent = ctx.indent();
                 ctx.emit(&format!("{}{};", indent, &self.emit_value(expr)));

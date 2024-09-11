@@ -72,3 +72,7 @@ end
 let f = |n: vector<int>|
   n
 end
+
+type a = b end
+
+type a <T> = T end
