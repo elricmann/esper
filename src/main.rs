@@ -16,7 +16,7 @@ fn main() {
         Ok(program) => {
             dbg!(&program);
             let mut ctx = EmitContextImpl::new();
-            ctx.use_glibcxx = true;
+            ctx.use_prelude = true;
             let mut out = EmitDefault { ctx };
             let out = out.emit_program(&program, "test".into());
             println!("{}", out);

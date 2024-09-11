@@ -58,6 +58,8 @@ let swap: tuple<int> = |a: int, b: int|
   [a, b]
 end
 
+(* loops *)
+
 loop a in b [] end
 loop p in q.r. [] end
 
@@ -72,6 +74,8 @@ end
 let f = |n: vector<int>|
   n
 end
+
+(* type-related semantics *)
 
 type a = b end
 

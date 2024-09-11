@@ -252,4 +252,4 @@ _-_
 
 ### License
 
-Copyright © MIT License & GPLv3 License. Esper is dual-licensed by source; however, for program outputs, if `EmitContextImpl::use_glibcxx` is enabled (default), it includes headers for `libstdc++`, which is GNU software.
+Copyright © MIT License.

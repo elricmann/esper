@@ -8,19 +8,12 @@ use crate::visit::{EsperContext, Visitor};
 // 3 - public class member definitions (leaky abstractions) is forced
 // 4 - C++ initializer list for RHS list-like expressions
 
-// @todo:
-// 1 - type decls/alias for various
-// 2 - member expr with trailing/leading callable
-// 3 - constructors & destructors, copy constructor & move semantics
-// 4 - refs & derefs for raw values and directives for smart ptrs
-// 5 - operator overloading (maybe?)
-
 #[derive(Debug, Clone)]
 pub struct EmitContextImpl {
     pub level: usize,
     pub output: String,
     pub module: String,
-    pub use_glibcxx: bool,
+    pub use_prelude: bool,
 }
 
 impl EmitContextImpl {
@@ -29,7 +22,7 @@ impl EmitContextImpl {
             level: 0,
             output: String::new(),
             module: String::new(),
-            use_glibcxx: false,
+            use_prelude: false,
         }
     }
 
@@ -66,8 +59,8 @@ impl EmitDefault {
     pub fn emit_expr(&self, ctx: &mut EmitContextImpl, expr: &Expr) {
         match expr {
             Expr::Program(exprs) => {
-                if ctx.use_glibcxx {
-                    ctx.emit(include_str!("../lib/stdc++.h"));
+                if ctx.use_prelude {
+                    ctx.emit(include_str!("./prelude.h"));
                 }
 
                 ctx.emit("using namespace std;\n");
