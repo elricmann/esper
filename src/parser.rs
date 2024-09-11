@@ -3,7 +3,7 @@ use peg::parser;
 parser! {
   pub grammar esper_parser() for str {
     rule typed_expr() -> Expr
-      = typed_literal() / typed_symbol() / typed_variant()
+      = typed_literal() / typed_symbol_generic() / typed_symbol() / typed_variant()
 
     rule typed_literal() -> Expr
       = ty:(integer_literal() / float_literal() / bool_literal())
@@ -11,6 +11,10 @@ parser! {
 
     rule typed_symbol() -> Expr
       = id:identifier() { Expr::TypedSymbol(id.into()) }
+
+    rule typed_symbol_generic() -> Expr
+      = id:identifier() _ ty:type_generic()
+      { Expr::TypedSymbolGeneric(id.into(), ty) }
 
     rule type_alias() -> Expr
     = "type" _ id:identifier() _ "=" _ type_expr:typed_expr() _ "end" {
@@ -98,11 +102,6 @@ parser! {
 
     rule member_expr() -> Expr
     =
-    // base:identifier_expr() (_ "." _) rest:identifier_expr() {
-    //     let mut members = vec![base, rest];
-    //     Expr::Member(members)
-    //   }
-    // /
     base:identifier_expr() (_ "." _) rest:(member_expr() / call_expr())* {
         let mut members = vec![base];
         members.extend(rest);
@@ -293,6 +292,7 @@ pub enum Expr {
     Struct(String, Vec<(String, Expr)>),
     TypedSymbol(String),
     TypedLiteral(Box<Expr>),
+    TypedSymbolGeneric(String, Vec<Expr>),
     TypedVariant(Box<Expr>, Box<Expr>),
     TypedLet(String, Box<Expr>, Box<Expr>),
     TypeAlias(String, Vec<Expr>, Box<Expr>),

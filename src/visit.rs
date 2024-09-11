@@ -125,6 +125,12 @@ impl Visitor for Expr {
 
             Expr::TypedSymbol(_) => {}
 
+            Expr::TypedSymbolGeneric(_, exprs) => {
+                for expr in exprs {
+                    expr.visit(ctx, callback);
+                }
+            }
+
             Expr::TypedLiteral(expr) => expr.visit(ctx, callback),
 
             Expr::TypedVariant(lhs, rhs) => {

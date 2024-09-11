@@ -48,3 +48,5 @@ struct B
   c : int,
   d : |a: int| a - c end
 end
+
+let p : vector<int> = none
