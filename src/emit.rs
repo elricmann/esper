@@ -249,6 +249,26 @@ impl EmitDefault {
                 }
             }
 
+            Expr::Loop(loop_var, iter_expr, body) => {
+                let loop_var_str = self.emit_value(loop_var);
+                let iter_str = self.emit_value(iter_expr);
+                let indent = ctx.indent();
+
+                ctx.emit(&format!(
+                    "{}for (auto {} : {}) {{",
+                    indent, loop_var_str, iter_str
+                ));
+
+                ctx.level += 2;
+
+                for expr in body {
+                    self.emit_expr(ctx, expr);
+                }
+
+                ctx.level -= 2;
+                ctx.emit(&format!("{}}}", indent));
+            }
+
             Expr::Struct(name, entries) => {
                 let indent = ctx.indent();
                 ctx.emit(&format!("\nclass {} {{", name));

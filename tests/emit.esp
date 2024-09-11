@@ -57,3 +57,10 @@ let swap: tuple<int> = |a: int, b: int|
   b = tmp;
   [a, b]
 end
+
+loop a in b [] end
+loop p in q.r. [] end
+
+loop i in 0..10
+  printf(i)
+end
