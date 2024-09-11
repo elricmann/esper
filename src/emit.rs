@@ -342,6 +342,18 @@ impl EmitDefault {
                         ));
                     }
 
+                    Expr::TypedMember(expr) => {
+                        if let Expr::Member(member_expr) = expr.as_ref() {
+                            ctx.emit(&format!(
+                                "{}{}using {} = {};",
+                                indent,
+                                template_str,
+                                name,
+                                self.emit_value(expr).replace(".", "::")
+                            ));
+                        }
+                    }
+
                     Expr::TypedRecord(record_expr) => {
                         if let Expr::Record(entries) = record_expr.as_ref() {
                             ctx.emit(&format!("{}{}struct {} {{", indent, template_str, name));
