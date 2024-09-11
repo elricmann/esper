@@ -200,7 +200,49 @@ public:
 </td>
 <td>
 
-_All symbols are public without a `@pub`. Structs are classes. Methods are fields with function rvalues._
+_All symbols are public without `@pub`. Structs are classes. Methods are fields with function rvalues._
+
+</td>
+</tr>
+
+<!-- Loops -->
+<tr>
+<td>Loops</td>
+<td>
+
+```rust
+loop a in b [] end
+loop p in q.r. [] end
+
+loop i in 0..10
+  io.print(i)
+end
+
+loop [a, b] in c
+  print(a, b)
+end
+```
+
+</td>
+<td>
+
+```cpp
+for (auto a : b) {}
+for (auto p : q.r) {}
+
+for (auto i : ranges::views::iota(0,10)) {
+  print(i);
+}
+
+for (auto [a, b] : c) {
+  print(a, b);
+}
+```
+
+</td>
+<td>
+
+_-_
 
 </td>
 </tr>
