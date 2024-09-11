@@ -215,7 +215,7 @@ loop a in b [] end
 loop p in q.r. [] end
 
 loop i in 0..10
-  io.print(i)
+  print(i)
 end
 
 loop [a, b] in c
