@@ -84,3 +84,5 @@ type a <T> = T end
 type b <P, Q> = | P | Q end
 
 type a <T, K> = { key: T, value: K } end
+
+type p <Q> = Q.key. end

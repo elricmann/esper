@@ -133,6 +133,8 @@ impl Visitor for Expr {
 
             Expr::TypedLiteral(expr) => expr.visit(ctx, callback),
 
+            Expr::TypedMember(expr) => expr.visit(ctx, callback),
+
             Expr::TypedVariant(lhs, rhs) => {
                 lhs.visit(ctx, callback);
                 rhs.visit(ctx, callback);

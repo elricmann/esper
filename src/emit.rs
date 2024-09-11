@@ -63,7 +63,6 @@ impl EmitDefault {
                     ctx.emit(include_str!("./prelude.h"));
                 }
 
-                ctx.emit("using namespace std;\n");
                 ctx.emit(&format!("namespace {} {{", ctx.module));
                 // ctx.level = 2;
                 // ctx.emit("");

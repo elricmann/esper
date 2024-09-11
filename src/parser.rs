@@ -3,8 +3,8 @@ use peg::parser;
 parser! {
   pub grammar esper_parser() for str {
     rule typed_expr() -> Expr
-      = typed_literal() / typed_symbol_generic() / typed_symbol() /
-        typed_record() / typed_variant()
+      = typed_literal() / typed_member() / typed_symbol_generic() /
+        typed_symbol() / typed_record() / typed_variant()
 
     rule typed_literal() -> Expr
       = ty:(integer_literal() / float_literal() / bool_literal())
@@ -12,7 +12,7 @@ parser! {
 
     rule typed_symbol() -> Expr
       = id:identifier() { Expr::TypedSymbol(id.into()) }
-    
+
     rule typed_record_key() -> Expr
       = identifier_expr() / integer_literal()
 
@@ -26,8 +26,8 @@ parser! {
       Expr::TypedRecord(Box::new(Expr::Record(kv_pairs)))
     }
 
-    // rule typed_record() -> Expr
-    //   = rec:record() { Expr::TypedRecord(Box::new(rec)) }
+    rule typed_member() -> Expr
+      = expr:member_expr() { Expr::TypedMember(Box::new(expr)) }
 
     rule typed_symbol_generic() -> Expr
       = id:identifier() _ ty:type_generic()
@@ -309,6 +309,7 @@ pub enum Expr {
     Struct(String, Vec<(String, Expr)>),
     TypedSymbol(String),
     TypedLiteral(Box<Expr>),
+    TypedMember(Box<Expr>),
     TypedRecord(Box<Expr>),
     TypedSymbolGeneric(String, Vec<Expr>),
     TypedVariant(Box<Expr>, Box<Expr>),
