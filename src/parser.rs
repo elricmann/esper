@@ -3,7 +3,8 @@ use peg::parser;
 parser! {
   pub grammar esper_parser() for str {
     rule typed_expr() -> Expr
-      = typed_literal() / typed_symbol_generic() / typed_symbol() / typed_variant()
+      = typed_literal() / typed_symbol_generic() / typed_symbol() /
+        typed_record() / typed_variant()
 
     rule typed_literal() -> Expr
       = ty:(integer_literal() / float_literal() / bool_literal())
@@ -11,6 +12,22 @@ parser! {
 
     rule typed_symbol() -> Expr
       = id:identifier() { Expr::TypedSymbol(id.into()) }
+    
+    rule typed_record_key() -> Expr
+      = identifier_expr() / integer_literal()
+
+    rule typed_record_entry() -> (Expr, Expr)
+      = key:typed_record_key() _ ":" _ value:expr() { (key, value) }
+
+    rule typed_record() -> Expr
+      = "{" _ entries:(typed_record_entry() ** (_ "," _)) _ "}" {
+      let kv_pairs = entries.into_iter().map(|(key, value)| vec![key, value]).collect();
+
+      Expr::TypedRecord(Box::new(Expr::Record(kv_pairs)))
+    }
+
+    // rule typed_record() -> Expr
+    //   = rec:record() { Expr::TypedRecord(Box::new(rec)) }
 
     rule typed_symbol_generic() -> Expr
       = id:identifier() _ ty:type_generic()
@@ -292,6 +309,7 @@ pub enum Expr {
     Struct(String, Vec<(String, Expr)>),
     TypedSymbol(String),
     TypedLiteral(Box<Expr>),
+    TypedRecord(Box<Expr>),
     TypedSymbolGeneric(String, Vec<Expr>),
     TypedVariant(Box<Expr>, Box<Expr>),
     TypedLet(String, Box<Expr>, Box<Expr>),

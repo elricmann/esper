@@ -350,6 +350,30 @@ impl EmitDefault {
                         ));
                     }
 
+                    Expr::TypedRecord(record_expr) => {
+                        if let Expr::Record(entries) = record_expr.as_ref() {
+                            ctx.emit(&format!("{}{}struct {} {{", indent, template_str, name));
+                            ctx.level += 2;
+
+                            for entry in entries {
+                                if entry.len() == 2 {
+                                    dbg!(entry.clone());
+                                    let indent = ctx.indent();
+                                    let key_str = self.emit_value(&entry[0]);
+                                    let value_str = self.emit_type(&entry[1]);
+
+                                    ctx.emit(&format!(
+                                        "{}using {} = {};",
+                                        indent, key_str, value_str
+                                    ));
+                                }
+                            }
+
+                            ctx.level -= 2;
+                            ctx.emit(&format!("{}}};", indent));
+                        }
+                    }
+
                     _ => {
                         ctx.emit(&format!(
                             "{}{}using {} = {};",

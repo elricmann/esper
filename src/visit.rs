@@ -143,6 +143,16 @@ impl Visitor for Expr {
                 expr.visit(ctx, callback);
             }
 
+            Expr::TypedRecord(record) => {
+                if let Expr::Record(record) = *record.to_owned() {
+                    for entry in record.clone() {
+                        for expr in entry {
+                            expr.visit(ctx, callback);
+                        }
+                    }
+                }
+            }
+
             Expr::TypeAlias(_, _, expr) => expr.visit(ctx, callback),
 
             Expr::TypedCall(callee, _, args) => {
