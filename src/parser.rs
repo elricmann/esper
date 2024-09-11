@@ -131,8 +131,8 @@ parser! {
 
     // assign must hold the highest precedence
     rule primary() -> Expr
-      = assign() / paren_expr() / directive_expr() / struct_expr() / type_alias() / call_expr() /
-        range_expr() / member_expr() /
+      = assign() / paren_expr() / directive_expr() / struct_expr() /
+        type_alias() / call_expr() / range_expr() / member_expr() /
         loop_expr() / if_expr() / fn_expr() / let_binding() / bool_literal() /
         float_literal() / integer_literal() / string_literal() / char_literal() /
         identifier_expr() / list() / record()

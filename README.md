@@ -29,7 +29,6 @@ The table below compares Esper source programs to the corresponding C++ output (
 <tbody>
 
 <!-- typed variable definitions -->
-
 <tr>
 <td>Typed definitions</td>
 <td>
@@ -58,6 +57,30 @@ std::variant<bool, std::string> t = true;
 <td>
 
 _`Expr::TypedSymbol` represents type identifiers. Tagged unions are variant entries. Literal types are `decltype(T)` which is a non-constraint on the rvalue._
+
+</td>
+</tr>
+
+<!-- typed call expressions -->
+<tr>
+<td>Typed call expressions (postfix generics)</td>
+<td>
+
+```fs
+let lst = vector<int>()
+```
+
+</td>
+<td>
+
+```cpp
+auto lst = std::vector<int>();
+```
+
+</td>
+<td>
+
+_-_
 
 </td>
 </tr>
@@ -100,7 +123,6 @@ let swap: tuple<int> = |a: int, b: int|
   b = tmp;
   [a, b]
 end
-
 ```
 
 </td>
@@ -121,6 +143,41 @@ std::tuple<int> swap(a: int, b: int) {
 <td>
 
 _Required return type is the lvalue. Non-inferred parameter types. Last expression is returned. Multiline expressions are delimited with `;`._
+
+</td>
+</tr>
+
+<!-- Struct definition -->
+<tr>
+<td>Struct definition</td>
+<td>
+
+```fs
+struct A end
+
+struct B
+  c: float,
+  d: || c end
+end
+```
+
+</td>
+<td>
+
+```cpp
+class A {};
+
+class B {
+public:
+  float c;
+  auto d() { return c; }
+};
+```
+
+</td>
+<td>
+
+_All symbols are public without a `@pub`. Structs are classes. Methods are fields with function rvalues._
 
 </td>
 </tr>
