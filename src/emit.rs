@@ -342,18 +342,18 @@ impl EmitDefault {
                         ));
                     }
 
-                    Expr::TypedMember(expr) => {
-                        if let Expr::Member(member_expr) = expr.as_ref() {
-                            ctx.emit(&format!(
-                                "{}{}using {} = {};",
-                                indent,
-                                template_str,
-                                name,
-                                self.emit_value(expr).replace(".", "::")
-                            ));
-                        }
-                    }
-
+                    // @todo: move to self.emit_type
+                    // Expr::TypedMember(expr) => {
+                    //     if let Expr::Member(member_expr) = expr.as_ref() {
+                    //         ctx.emit(&format!(
+                    //             "{}{}using {} = {};",
+                    //             indent,
+                    //             template_str,
+                    //             name,
+                    //             self.emit_value(expr).replace(".", "::")
+                    //         ));
+                    //     }
+                    // }
                     Expr::TypedRecord(record_expr) => {
                         if let Expr::Record(entries) = record_expr.as_ref() {
                             ctx.emit(&format!("{}{}struct {} {{", indent, template_str, name));
@@ -513,6 +513,8 @@ impl EmitDefault {
             Expr::TypedLiteral(type_name) => {
                 format!("decltype({})", self.emit_value(type_name))
             }
+
+            Expr::TypedMember(member_expr) => self.emit_value(member_expr).replace(".", "::"),
 
             Expr::TypedSymbolGeneric(type_name, ty_params) => {
                 let ty_params_str = if !ty_params.is_empty() {
