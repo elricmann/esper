@@ -412,9 +412,26 @@ impl EmitDefault {
         match ty {
             Expr::TypedSymbol(type_name) => type_name.clone(),
             Expr::TypedVariant(lhs, rhs) => self.emit_variant(lhs, rhs),
+
             Expr::TypedLiteral(type_name) => {
                 format!("decltype({})", self.emit_value(type_name))
             }
+
+            Expr::TypedSymbolGeneric(type_name, ty_params) => {
+                let ty_params_str = if !ty_params.is_empty() {
+                    let ty_params_str = ty_params
+                        .iter()
+                        .map(|gen| self.emit_type(gen))
+                        .collect::<Vec<_>>()
+                        .join(", ");
+                    format!("<{}>", ty_params_str)
+                } else {
+                    String::new()
+                };
+
+                format!("{}{}", type_name, ty_params_str)
+            }
+
             _ => String::new(),
         }
     }

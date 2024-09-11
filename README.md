@@ -39,7 +39,6 @@ let n : int = 0
 let p : 0 = 0
 
 let t :| bool | string = true
-
 ```
 
 </td>
@@ -57,6 +56,30 @@ std::variant<bool, std::string> t = true;
 <td>
 
 _`Expr::TypedSymbol` represents type identifiers. Tagged unions are variant entries. Literal types are `decltype(T)` which is a non-constraint on the rvalue._
+
+</td>
+</tr>
+
+<!-- Parameterized type -->
+<tr>
+<td>Parameterized types (postfix generics)</td>
+<td>
+
+```fs
+let lst : vector<int> = []
+```
+
+</td>
+<td>
+
+```cpp
+std::vector<int> lst = {};
+```
+
+</td>
+<td>
+
+_-_
 
 </td>
 </tr>
