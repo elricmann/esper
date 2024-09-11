@@ -103,7 +103,7 @@ parser! {
     //     Expr::Member(members)
     //   }
     // /
-    base:identifier_expr() (_ "." _) rest:(member_expr())* {
+    base:identifier_expr() (_ "." _) rest:(member_expr() / call_expr())* {
         let mut members = vec![base];
         members.extend(rest);
         Expr::Member(members)
