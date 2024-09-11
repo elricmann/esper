@@ -68,3 +68,7 @@ end
 loop [a, b] in c
   print(a, b)
 end
+
+let f = |n: vector<int>|
+  n
+end
