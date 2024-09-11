@@ -50,3 +50,10 @@ struct B
 end
 
 let p : vector<int> = none
+
+let swap: tuple<int> = |a: int, b: int|
+  let tmp = a;
+  a = b;
+  b = tmp;
+  [a, b]
+end

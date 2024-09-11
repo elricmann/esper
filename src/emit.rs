@@ -119,6 +119,11 @@ impl EmitDefault {
                                     | Expr::Var(_)
                                     | Expr::Bin(_, _, _)
                                     | Expr::Compare(_, _, _)
+                                    | Expr::List(_)
+                                    | Expr::Member(_)
+                                    | Expr::Range(_, _)
+                                    | Expr::Call(_, _)
+                                    | Expr::TypedCall(_, _, _)
                             ) {
                                 let indent = ctx.indent();
                                 ctx.emit(&format!("{}return {};", indent, self.emit_value(last)));
@@ -179,6 +184,11 @@ impl EmitDefault {
                                     | Expr::Var(_)
                                     | Expr::Bin(_, _, _)
                                     | Expr::Compare(_, _, _)
+                                    | Expr::List(_)
+                                    | Expr::Member(_)
+                                    | Expr::Range(_, _)
+                                    | Expr::Call(_, _)
+                                    | Expr::TypedCall(_, _, _)
                             ) {
                                 let indent = ctx.indent();
                                 ctx.emit(&format!("{}return {};", indent, self.emit_value(last)));
