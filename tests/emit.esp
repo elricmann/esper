@@ -62,5 +62,9 @@ loop a in b [] end
 loop p in q.r. [] end
 
 loop i in 0..10
-  printf(i)
+  print(i)
+end
+
+loop [a, b] in c
+  print(a, b)
 end

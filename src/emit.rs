@@ -250,12 +250,17 @@ impl EmitDefault {
             }
 
             Expr::Loop(loop_var, iter_expr, body) => {
-                let loop_var_str = self.emit_value(loop_var);
+                let mut loop_var_str = self.emit_value(loop_var);
                 let iter_str = self.emit_value(iter_expr);
                 let indent = ctx.indent();
 
+                if (matches!(*loop_var.to_owned(), Expr::List(_))) {
+                    loop_var_str.replace_range(0..1, "[");
+                    loop_var_str.replace_range(loop_var_str.len() - 1..loop_var_str.len(), "]");
+                }
+
                 ctx.emit(&format!(
-                    "{}for (auto {} : {}) {{",
+                    "\n{}for (auto {} : {}) {{",
                     indent, loop_var_str, iter_str
                 ));
 
