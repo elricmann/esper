@@ -349,7 +349,16 @@ impl EmitDefault {
                             indent, template_str, name, ty
                         ));
                     }
-                    _ => {}
+
+                    _ => {
+                        ctx.emit(&format!(
+                            "{}{}using {} = {};",
+                            indent,
+                            template_str,
+                            name,
+                            self.emit_type(rhs)
+                        ));
+                    }
                 }
             }
 
@@ -508,7 +517,7 @@ impl EmitDefault {
             }
             _ => {
                 let rhs_str = self.emit_type(rhs);
-                format!("variant<{} | {}>", lhs_str, rhs_str)
+                format!("variant<{}, {}>", lhs_str, rhs_str)
             }
         }
     }

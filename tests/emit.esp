@@ -76,3 +76,5 @@ end
 type a = b end
 
 type a <T> = T end
+
+type b <P, Q> = | P | Q end
