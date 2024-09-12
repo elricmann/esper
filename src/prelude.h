@@ -39,6 +39,24 @@ template <typename T>
 using unwrap = typename unwrap_t<T>::Type;
 
 /**
+ * @brief describes a list of types and associated properties,
+ *        in this case, statically finding the length of the list
+ */
+template <typename... Ts>
+struct type_list {};
+
+template <typename List>
+struct length_t;
+
+template <typename... Ts>
+struct length_t<type_list<Ts...>> {
+  static constexpr std::size_t value = sizeof...(Ts);
+};
+
+template <typename L>
+constexpr std::size_t length = length_t<L>::value;
+
+/**
  * @class __esper main class for holding function definitions
  * @brief static methods on __esper are used as to avoid the :: syntax
  */
