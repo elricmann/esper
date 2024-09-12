@@ -58,6 +58,7 @@ constexpr std::size_t length = length_t<L>::value;
 
 /**
  * @brief allows asserting whether a type parameter is a container type
+ *        as a SFINAE pattern (substitution failure is not an error)
  */
 template <typename T, typename = void>
 struct is_container_t : std::false_type {};
@@ -69,6 +70,19 @@ struct is_container_t<T,
 
 template <typename T>
 inline constexpr bool is_container = is_container_t<T>::value;
+
+/**
+ * @brief decay's a likely-reference type to it's value type, removes
+ * const/volatile qualifiers and casts arrays to pointers
+ */
+template <typename T>
+struct decay_t {
+  using Type =
+      typename std::remove_cv<typename std::remove_reference<T>::type>::type;
+};
+
+template <typename T>
+using decay = typename decay_t<T>::Type;
 
 /**
  * @class __esper main class for holding function definitions
