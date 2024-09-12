@@ -93,3 +93,12 @@ type tree<T> = {
   value: T,
   children: vector<tree<T>>
 } end
+
+type R = ?int end                     (* optional alias *)
+
+type S =
+  | ?int
+  | ?bool
+end                                   (* variant of optionals *)
+
+type T = ?| int | bool end            (* optional of variant of types *)

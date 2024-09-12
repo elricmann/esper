@@ -513,6 +513,10 @@ impl EmitDefault {
                 format!("decltype({})", self.emit_value(type_name))
             }
 
+            Expr::TypedOptional(ty) => {
+                format!("optional<{}>", self.emit_type(ty))
+            }
+
             Expr::TypedMember(member_expr) => self.emit_value(member_expr).replace(".", "::"),
 
             Expr::TypedSymbolGeneric(type_name, ty_params) => {
