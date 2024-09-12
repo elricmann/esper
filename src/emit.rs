@@ -342,18 +342,6 @@ impl EmitDefault {
                         ));
                     }
 
-                    // @todo: move to self.emit_type
-                    // Expr::TypedMember(expr) => {
-                    //     if let Expr::Member(member_expr) = expr.as_ref() {
-                    //         ctx.emit(&format!(
-                    //             "{}{}using {} = {};",
-                    //             indent,
-                    //             template_str,
-                    //             name,
-                    //             self.emit_value(expr).replace(".", "::")
-                    //         ));
-                    //     }
-                    // }
                     Expr::TypedRecord(record_expr) => {
                         if let Expr::Record(entries) = record_expr.as_ref() {
                             ctx.emit(&format!("{}{}struct {} {{", indent, template_str, name));
@@ -361,7 +349,6 @@ impl EmitDefault {
 
                             for entry in entries {
                                 if entry.len() == 2 {
-                                    dbg!(entry.clone());
                                     let indent = ctx.indent();
                                     let key_str = self.emit_value(&entry[0]);
                                     let value_str = self.emit_type(&entry[1]);
@@ -386,6 +373,18 @@ impl EmitDefault {
                             name,
                             self.emit_type(rhs)
                         ));
+                    }
+                }
+            }
+
+            Expr::Directive(directive, expr) => {
+                if let Expr::Call(callee, args) = directive.as_ref() {
+                    if let Expr::Var(directive_name) = callee.as_ref() {
+                        if directive_name == "extend" {
+                            if let [Expr::Var(ident), Expr::Var(ty)] = &args[..] {
+                                self.emit_extend(ctx, ident, ty, expr);
+                            }
+                        }
                     }
                 }
             }
@@ -549,6 +548,38 @@ impl EmitDefault {
                 let rhs_str = self.emit_type(rhs);
                 format!("variant<{}, {}>", lhs_str, rhs_str)
             }
+        }
+    }
+
+    fn emit_extend(&self, ctx: &mut EmitContextImpl, ident: &str, ext_ty: &str, expr: &Expr) {
+        match expr {
+            Expr::TypeAlias(name, ty_params, rhs) => {
+                // we'll only modify the RHS type (not the generic type params) based on @extend
+                // let updated_rhs = self.replace_with_enable_if(ident, ext_ty, rhs);
+                let updated_rhs = match rhs.as_ref() {
+                    Expr::TypedSymbol(type_name) if type_name == ident => {
+                        Box::new(Expr::TypedSymbol(format!(
+                            "std::enable_if_t<std::is_same<{}, {}>::value, {}>",
+                            ident, ext_ty, ident
+                        )))
+                    }
+
+                    _ => rhs.clone(),
+                };
+
+                self.emit_expr(
+                    ctx,
+                    &Expr::TypeAlias(name.clone(), ty_params.clone(), updated_rhs),
+                );
+            }
+
+            // recurse all nested extend directives
+            Expr::Directive(directive, inner_expr) => {
+                self.emit_extend(ctx, ident, ext_ty, inner_expr);
+                // self.emit_expr(ctx, expr);
+            }
+
+            _ => {}
         }
     }
 }

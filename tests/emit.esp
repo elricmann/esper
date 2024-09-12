@@ -77,12 +77,14 @@ end
 
 (* type-related semantics *)
 
-type a = b end
+type A = b end
 
-type a <T> = T end
+type A<T> = T end
 
-type b <P, Q> = | P | Q end
+type B<P, Q> = | P | Q end
 
-type a <T, K> = { key: T, value: K } end
+type A<T, K> = { key: T, value: K } end
 
-type p <Q> = Q.key. end
+type P<Q> = Q.key. end
+
+@extend(S, string) type R<S> = S end
