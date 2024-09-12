@@ -22,6 +22,24 @@ template <typename T, typename U, typename V>
 using req = typename std::conditional<std::is_same<T, U>::value, U, V>::type;
 
 /**
+ * @brief unwraps a shared pointer until the inner-most non-shared
+ *        value is found from a constructed type of std::shared_ptr
+ */
+template <typename T>
+struct unwrap_t {
+  using Type = T;
+};
+
+template <typename T>
+struct unwrap_t<std::shared_ptr<T>> {
+  using Type = typename unwrap_t<T>::Type;
+};
+
+template <typename T>
+using unwrap = typename unwrap_t<T>::Type;
+
+/**
+ * @class __esper main class for holding function definitions
  * @brief static methods on __esper are used as to avoid the :: syntax
  */
 class __esper;
