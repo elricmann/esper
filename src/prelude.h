@@ -57,6 +57,20 @@ template <typename L>
 constexpr std::size_t length = length_t<L>::value;
 
 /**
+ * @brief allows asserting whether a type parameter is a container type
+ */
+template <typename T, typename = void>
+struct is_container_t : std::false_type {};
+
+template <typename T>
+struct is_container_t<T,
+                      std::void_t<typename T::value_type, typename T::iterator>>
+    : std::true_type {};
+
+template <typename T>
+inline constexpr bool is_container = is_container_t<T>::value;
+
+/**
  * @class __esper main class for holding function definitions
  * @brief static methods on __esper are used as to avoid the :: syntax
  */
