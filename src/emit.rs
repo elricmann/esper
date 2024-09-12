@@ -12,7 +12,7 @@ use crate::visit::{EsperContext, Visitor};
 pub struct EmitContextImpl {
     pub level: usize,
     pub output: String,
-    pub module: String,
+    pub module_id: String,
     pub use_prelude: bool,
 }
 
@@ -21,7 +21,7 @@ impl EmitContextImpl {
         EmitContextImpl {
             level: 0,
             output: String::new(),
-            module: String::new(),
+            module_id: String::new(),
             use_prelude: false,
         }
     }
@@ -51,7 +51,7 @@ impl EmitDefault {
     pub fn emit_program(&mut self, expr: &Expr, module_id: &str) -> String {
         let mut ctx = self.ctx.clone();
 
-        ctx.module = module_id.into();
+        ctx.module_id = module_id.into();
         self.emit_expr(&mut ctx, expr);
         ctx.output
     }
@@ -63,7 +63,7 @@ impl EmitDefault {
                     ctx.emit(include_str!("./prelude.h"));
                 }
 
-                ctx.emit(&format!("namespace {} {{", ctx.module));
+                ctx.emit(&format!("namespace {} {{", ctx.module_id));
                 // ctx.level = 2;
                 // ctx.emit("");
 
@@ -72,7 +72,12 @@ impl EmitDefault {
                 }
 
                 // ctx.emit("");
-                ctx.emit(&format!("}} // namespace {}", ctx.module));
+                ctx.emit(&format!("}} // namespace {}", ctx.module_id));
+                ctx.emit("");
+                ctx.emit(&format!(
+                    "int main(int argc, const char** argv) {{ return {}::main(argc, std::vector<std::string>(argv + 1, argv + argc)); }}",
+                    ctx.module_id)
+                );
             }
 
             Expr::Let(var, value) => {

@@ -1,0 +1,4 @@
+let main: int = |argc: int, argv: vector<int>|
+  print(true);
+  0
+end

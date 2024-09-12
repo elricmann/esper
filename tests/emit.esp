@@ -117,6 +117,10 @@ type F =
   |a: int, b: float| ?int end
 end
 
-type _F =
+type P =
   |a: int, b: | bool | float| ?int end
+end
+
+let main: int = ||
+  print(false)
 end
