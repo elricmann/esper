@@ -88,3 +88,8 @@ type A<T, K> = { key: T, value: K } end
 type P<Q> = Q.key. end
 
 @extend(S, string) type R<S> = S end
+
+type tree<T> = {
+  value: T,
+  children: vector<tree<T>>
+} end
