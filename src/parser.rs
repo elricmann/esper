@@ -19,7 +19,24 @@ parser! {
     }
 
     rule typed_fn_expr() -> Expr
-      = f:fn_expr() { Expr::TypedFn(Box::new(f)) }
+    = "|" _ args:(fn_arg() ** (_ "," _)) _ "|" _ ty:typed_expr() _ "end" {
+      Expr::TypedFn(
+        Box::new(
+          Expr::Fn(args, vec![ty])
+        )
+      )
+    }
+
+    rule typed_fn_arg() -> (String, Option<Expr>)
+    = id:identifier() _ ":" _ ty:typed_expr() {
+        (id.into(), Some(ty))
+    }
+    / id:identifier() {
+        (id.into(), None)
+    }
+
+    // rule typed_fn_expr() -> Expr
+    //   = f:fn_expr() { Expr::TypedFn(Box::new(f)) }
 
     rule typed_record_key() -> Expr
       = identifier_expr() / integer_literal()

@@ -114,5 +114,9 @@ match n with
 end
 
 type F =
-  |a: int| int end
+  |a: int, b: float| ?int end
+end
+
+type _F =
+  |a: int, b: | bool | float| ?int end
 end
