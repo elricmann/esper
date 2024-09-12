@@ -73,7 +73,7 @@ inline constexpr bool is_container = is_container_t<T>::value;
 
 /**
  * @brief decay's a likely-reference type to it's value type, removes
- * const/volatile qualifiers and casts arrays to pointers
+ *        const/volatile qualifiers and casts arrays to pointers
  */
 template <typename T>
 struct decay_t {
@@ -83,6 +83,28 @@ struct decay_t {
 
 template <typename T>
 using decay = typename decay_t<T>::Type;
+
+/**
+ * @brief dereferences reference types, deref_t is overloaded to avoid
+ *        more general type erasure features from std
+ */
+template <typename T>
+struct deref_t {
+  using Type = T;
+};
+
+template <typename T>
+struct deref_t<T &> {
+  using Type = T;
+};
+
+template <typename T>
+struct deref_t<T &&> {
+  using Type = T;
+};
+
+template <typename T>
+using deref = typename deref_t<T>::Type;
 
 /**
  * @class __esper main class for holding function definitions
