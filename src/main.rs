@@ -1,11 +1,13 @@
 #![allow(warnings, dead_code)]
 
+mod cc;
 mod emit;
 mod parser;
 mod visit;
 
 use emit::EmitContextImpl;
 
+use crate::cc::ClangCXX;
 use crate::emit::EmitDefault;
 use crate::parser::esper_parser;
 
@@ -20,6 +22,11 @@ fn main() {
             let mut out = EmitDefault { ctx };
             let out = out.emit_program(&program, "validate".into());
             println!("{}", out);
+            // ClangCXX::compile(
+            //     "#include <iostream>\nint main() { std::cout << \"test\"; return 0; }",
+            //     "example",
+            // )
+            // .unwrap();
         }
 
         Err(err) => {
