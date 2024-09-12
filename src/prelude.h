@@ -107,6 +107,32 @@ template <typename T>
 using deref = typename deref_t<T>::Type;
 
 /**
+ * @brief casts a value type to a pointer type. ptr<T> casts to a
+ *        single pointer type whereas ptr_t<T> is variadic. we do
+ *        this to avoid having to use pointer-like syntax in esper.
+ *        however, the syntax itself will still be required when
+ *        changing values in the context of the program itself
+ */
+template <typename T, unsigned N>
+struct ptr_t_impl {
+  using type = typename ptr_t_impl<T *, N - 1>::type;
+};
+
+// ptr_t_impl is a recursive template to add N pointers
+// which requires a base case overload when when N = 0
+template <typename T>
+struct ptr_t_impl<T, 0> {
+  using type = T;
+};
+
+template <typename T, unsigned N>  // alias for ptr_t_impl with N
+using ptr_t = typename ptr_t_impl<T, N>::type;
+
+// add a single ptr
+template <typename T>
+using ptr = T *;
+
+/**
  * @class __esper main class for holding function definitions
  * @brief static methods on __esper are used as to avoid the :: syntax
  */
