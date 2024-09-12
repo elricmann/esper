@@ -266,6 +266,39 @@ impl EmitDefault {
                 ctx.emit(&format!("{}}}", indent));
             }
 
+            Expr::Match(cond, cases) => {
+                let cond_str = self.emit_value(cond);
+                let indent = ctx.indent();
+
+                ctx.emit(&format!("{}std::visit([](auto&& _) {{", indent));
+                ctx.level += 2;
+                let indent = ctx.indent();
+                ctx.emit(&format!("{}using T = std::decay_t<decltype(_)>;", indent));
+
+                // ctx.level += 2;
+
+                for (pat, body) in cases {
+                    let indent = ctx.indent();
+                    let pat_str = self.emit_value(&Expr::Var(pat.clone()));
+
+                    ctx.emit(&format!(
+                        "{}if constexpr (std::is_same_v<T, {}>) {{",
+                        indent, pat_str
+                    ));
+                    ctx.level += 2;
+
+                    for expr in body {
+                        self.emit_expr(ctx, expr);
+                    }
+
+                    ctx.level -= 2;
+                    ctx.emit(&format!("{}}}", indent));
+                }
+
+                ctx.level -= 2;
+                ctx.emit(&format!("{}}}, {});", indent, cond_str));
+            }
+
             Expr::Struct(name, entries) => {
                 let indent = ctx.indent();
                 ctx.emit(&format!("\nclass {} {{", name));

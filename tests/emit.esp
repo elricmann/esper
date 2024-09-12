@@ -104,9 +104,11 @@ end                                   (* variant of optionals *)
 type T = ?| int | bool end            (* optional of variant of types *)
 
 (* pattern matching *)
-match a with
+let n: | int | bool = 0
+
+match n with
 | int ->
   print("entering");
-  print("int: ", a),
-| string -> print("string: ", a),
+  print("int: ", _),
+| string -> print("string: ", _),
 end
