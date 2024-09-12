@@ -4,7 +4,7 @@ parser! {
   pub grammar esper_parser() for str {
     rule typed_expr() -> Expr
       = typed_literal() / typed_member() / typed_symbol_generic() /
-        typed_symbol() / type_optional() / typed_record() / typed_variant()
+        typed_symbol() / type_optional() / typed_record() / typed_variant() / typed_fn_expr()
 
     rule typed_literal() -> Expr
       = ty:(integer_literal() / float_literal() / bool_literal())
@@ -17,6 +17,9 @@ parser! {
       = "?" _ ty:typed_expr() {
       Expr::TypedOptional(Box::new(ty))
     }
+
+    rule typed_fn_expr() -> Expr
+      = f:fn_expr() { Expr::TypedFn(Box::new(f)) }
 
     rule typed_record_key() -> Expr
       = identifier_expr() / integer_literal()
@@ -324,6 +327,7 @@ pub enum Expr {
     Call(Box<Expr>, Vec<Expr>),
     Struct(String, Vec<(String, Expr)>),
     TypedSymbol(String),
+    TypedFn(Box<Expr>),
     TypedLiteral(Box<Expr>),
     TypedMember(Box<Expr>),
     TypedRecord(Box<Expr>),

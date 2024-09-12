@@ -151,6 +151,8 @@ impl Visitor for Expr {
                 rhs.visit(ctx, callback);
             }
 
+            Expr::TypedFn(expr) => expr.visit(ctx, callback),
+
             Expr::TypedLet(_, ty, expr) => {
                 ty.visit(ctx, callback);
                 expr.visit(ctx, callback);

@@ -112,3 +112,7 @@ match n with
   print("int: ", _),
 | string -> print("string: ", _),
 end
+
+type F =
+  |a: int| int end
+end

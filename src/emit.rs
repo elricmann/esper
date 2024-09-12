@@ -567,6 +567,28 @@ impl EmitDefault {
                 format!("{}{}", type_name, ty_params_str)
             }
 
+            Expr::TypedFn(fn_expr) => {
+                if let Expr::Fn(params, body) = fn_expr.as_ref() {
+                    if let Some(last_expr) = body.last() {
+                        let params_str = params
+                            .iter()
+                            .map(|(_, ty)| {
+                                ty.as_ref()
+                                    .map(|t| self.emit_type(t))
+                                    .unwrap_or_else(|| "void".to_string())
+                            })
+                            .collect::<Vec<_>>()
+                            .join(", ");
+
+                        let ret_type_str = self.emit_type(last_expr);
+
+                        return format!("std::function<{}({})>", ret_type_str, params_str);
+                    }
+                }
+
+                String::new()
+            }
+
             _ => String::new(),
         }
     }
