@@ -159,5 +159,21 @@ class __esper {
 
     return std::string(mangled_name);
   }
+
+  /**
+   * @brief wrapper over std::cout with variadic type args
+   */
+  void print() {}
+
+  template <typename T, typename... Args>
+  void print(const T &fst, const Args &...rst) {
+    std::cout << fst;
+
+    if constexpr (sizeof...(rst) > 0) {
+      std::cout << " ";
+    }
+
+    print(rst...);
+  }
 };
 }  // namespace __esper
