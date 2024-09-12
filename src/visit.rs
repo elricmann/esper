@@ -97,6 +97,16 @@ impl Visitor for Expr {
                 }
             }
 
+            Expr::Match(cond, cases) => {
+                cond.visit(ctx, callback);
+
+                for (pat, body) in cases {
+                    for expr in body {
+                        expr.visit(ctx, callback);
+                    }
+                }
+            }
+
             Expr::Fn(_, body) => {
                 for expr in body {
                     expr.visit(ctx, callback);

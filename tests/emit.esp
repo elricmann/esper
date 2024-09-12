@@ -102,3 +102,11 @@ type S =
 end                                   (* variant of optionals *)
 
 type T = ?| int | bool end            (* optional of variant of types *)
+
+(* pattern matching *)
+match a with
+| int ->
+  print("entering");
+  print("int: ", a),
+| string -> print("string: ", a),
+end
