@@ -29,7 +29,7 @@ esper <input> -o <output> -- -std=c++20 -Wall -O3
 
 ### Quick Overview
 
-The table below compares Esper source programs to the corresponding C++ output (target is `EmitDefault`). In context, a `main` function definition is expected since every module is in a separate namespace.
+The table below compares Esper source programs to the corresponding C++ output (target is `EmitDefault`). In context, a `main` function definition is expected since every module is in a separate namespace. Refer to the [tests](https://github.com/elricmann/esper/tree/main/tests).
 
 <table><thead>
 <tr>
@@ -296,7 +296,7 @@ _-_
 </td>
 <td>
 
-_Non-exhaustive matching, inner values captured as the `_`symbol. Requires`std::visit`and decaying inner value to base value types. Ideally,`get*if`and`holds_alternative` are performant but not as rigorous.*
+_Non-exhaustive matching, inner values captured as the `_`symbol. Requires`std::visit`and decaying inner value to base value types. Ideally,`get_if`and`holds_alternative` are performant but not as rigorous.\*
 
 </td>
 </tr>
@@ -523,6 +523,10 @@ _-_
 </tbody>
 </table>
 
+### Postscriptum
+
+Esper is **experimental** and aims to stay minimal. It may be clear by the absence of syntax like indexing access, equality checks, bitwise operators and value-based pointer/reference syntax (which is the case for now, but regarded as a _missing feature_). Aside, most matching semantics are not optimized, e.g `std::visit` for pattern matching is a known performance bottleneck, exclusively using STL Containers (`argv` is cast from a `const char**`), all `libstdc++` headers are included in the prelude, passing by value is exclusive and a wide range of impracticable error handling; with `clang++` errors being piped to `stdin`, PEG's obscure parsing errors and no type-level resolution of expressions.
+
 ### License
 
-Copyright © MIT License.
+Copyright © 2024 Elric Neumann. MIT License.
