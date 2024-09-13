@@ -20,6 +20,9 @@ struct Opt {
     output: PathBuf,
 
     #[structopt(short, long)]
+    prelude: bool,
+
+    #[structopt(short, long)]
     emit: bool,
 
     #[structopt(last = true)]
@@ -28,5 +31,5 @@ struct Opt {
 
 fn main() {
     let args = Opt::from_args();
-    compile(args.input, args.output, args.clang_flags, args.emit);
+    compile(args.input, args.output, args.clang_flags, args.prelude, args.emit);
 }

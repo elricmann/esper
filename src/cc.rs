@@ -6,23 +6,36 @@ use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
+fn file_prefix(path: &PathBuf) -> Option<String> {
+    path.file_stem()
+        .and_then(|stem| stem.to_str())
+        .map(|s| s.to_string())
+}
+
 pub(crate) fn compile(
-    input: PathBuf,
-    output: PathBuf,
+    input_path: PathBuf,
+    output_path: PathBuf,
     clang_flags: Vec<String>,
     use_prelude: bool,
+    should_emit: bool,
 ) {
-    let source = fs::read_to_string(input).expect("input file not found");
+    let source = fs::read_to_string(&input_path).expect("input file not found");
 
     match esper_parser::program(&source) {
         Ok(program) => {
             // dbg!(&program);
             let mut ctx = EmitContextImpl::new();
-            ctx.use_prelude = true;
-            let mut out = EmitDefault { ctx };
-            let out = out.emit_program(&program, "fib".into());
+            ctx.use_prelude = true; // force?
+            let mut emitter = EmitDefault { ctx };
+            // dbg!(file_prefix(&input_path));
+            let cxx_source = emitter.emit_program(&program, &file_prefix(&input_path).unwrap());
             // println!("{}", &out);
-            ClangCXX::compile(&out, output.to_str().unwrap(), clang_flags).unwrap();
+
+            if should_emit {
+                fs::write(&output_path, &cxx_source);
+            } else {
+                ClangCXX::compile(&cxx_source, output_path.to_str().unwrap(), clang_flags).unwrap();
+            }
         }
 
         Err(err) => {
