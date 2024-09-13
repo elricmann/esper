@@ -21,7 +21,11 @@ Minimum versions:
 
 Clone the repository, build with Cargo (`cargo build --release`), and run `esper --help`. Upstream build is tested on Debian with ELF binaries (target `x86_64-pc-linux-gnu`). On Windows, demangling issues may arise unless the prelude is excluded (WSL/MinGW should be fine).
 
-Range expressions require `-std=c++20` when compiling the generated C++ source.
+Range expressions require `-std=c++20` when compiling the output C++ source. Optional flags are passed to `clang++` as **raw arguments**.
+
+```sh
+esper <input> -o <output> -- -std=c++20 -Wall -O3
+```
 
 ### Quick Overview
 
