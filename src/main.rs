@@ -22,7 +22,7 @@ struct Opt {
     #[structopt(short, long)]
     emit: bool,
 
-    #[structopt(short = "cc", long = "clang-flags", use_delimiter = true)]
+    #[structopt(last = true)]
     clang_flags: Vec<String>,
 }
 
