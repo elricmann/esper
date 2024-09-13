@@ -1,3 +1,8 @@
+(**
+ * @filename fib.esp
+ * @brief iterable fibonacci
+ *)
+
 let fib = |n: int|
   let a: int = 0;
   let b: int = 1;
