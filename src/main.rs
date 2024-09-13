@@ -18,15 +18,11 @@ fn main() {
         Ok(program) => {
             // dbg!(&program);
             let mut ctx = EmitContextImpl::new();
-            // ctx.use_prelude = true;
+            ctx.use_prelude = true;
             let mut out = EmitDefault { ctx };
             let out = out.emit_program(&program, "validate".into());
-            println!("{}", out);
-            // ClangCXX::compile(
-            //     "#include <iostream>\nint main() { std::cout << \"test\"; return 0; }",
-            //     "example",
-            // )
-            // .unwrap();
+            // println!("{}", &out);
+            ClangCXX::compile(&out, "./tests/validate").unwrap();
         }
 
         Err(err) => {

@@ -472,14 +472,14 @@ _All symbols are public without `@pub`. Structs are classes. Methods are fields 
 <td>
 
 ```rust
-loop a in b [] end
-loop p in q.r. [] end
+for a in b [] end
+for p in q.r. [] end
 
-loop i in 0..10
+for i in 0..10
   print(i)
 end
 
-loop [a, b] in c
+for [a, b] in c
   print(a, b)
 end
 ```

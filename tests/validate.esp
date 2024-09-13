@@ -1,4 +1,9 @@
-let main: int = |argc: int, argv: vector<int>|
-  print(true);
+let main: int = |argc: int, argv: vector<string>|
+  esper.print("argc:", argc);
+
+  for arg in argv
+    esper.print("\n", arg)
+  end;
+
   0
 end

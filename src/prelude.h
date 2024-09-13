@@ -163,10 +163,10 @@ class __esper {
   /**
    * @brief wrapper over std::cout with variadic type args
    */
-  void print() {}
+  static void print() {}
 
   template <typename T, typename... Args>
-  void print(const T &fst, const Args &...rst) {
+  static void print(const T &fst, const Args &...rst) {
     std::cout << fst;
 
     if constexpr (sizeof...(rst) > 0) {

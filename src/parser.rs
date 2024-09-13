@@ -264,7 +264,7 @@ parser! {
     }
 
     rule loop_expr() -> Expr
-      = "loop" _ loop_var:expr() _ "in" _ iter:primary() _ body:body_expr() _ "end" {
+      = "for" _ loop_var:expr() _ "in" _ iter:primary() _ body:body_expr() _ "end" {
         Expr::Loop(Box::new(loop_var), Box::new(iter), body)
     }
 

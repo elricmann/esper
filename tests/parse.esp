@@ -23,7 +23,7 @@ else
   false
 end
 
-loop i in 2..3
+for i in 2..3
   i * 2;
   2 * i
 end
