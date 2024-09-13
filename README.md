@@ -13,7 +13,15 @@ This list is partially a feature matrix of existing features.
 
 ### Installation & usage
 
-_This section is incomplete._
+Minimum versions:
+
+- **rustup:** 1.27.0
+- **rustc:** 1.79.0-nightly
+- **clang++:** 16.0.6+ (release builds available with [LLVM installation](https://releases.llvm.org/download.html))
+
+Clone the repository, build with Cargo (`cargo build --release`), and run `esper --help`. Upstream build is tested on Debian with ELF binaries (target `x86_64-pc-linux-gnu`). On Windows, demangling issues may arise unless the prelude is excluded (WSL/MinGW should be fine).
+
+Range expressions require `-std=c++20` when compiling the generated C++ source.
 
 ### Quick Overview
 
@@ -284,7 +292,7 @@ _-_
 </td>
 <td>
 
-_Non-exhaustive matching, inner values captured as the `_` symbol. Requires `std::visit` and decaying inner value to base value types. Ideally, `get_if` and `holds_alternative` are performant but not as rigorous._
+_Non-exhaustive matching, inner values captured as the `_`symbol. Requires`std::visit`and decaying inner value to base value types. Ideally,`get*if`and`holds_alternative` are performant but not as rigorous.*
 
 </td>
 </tr>
