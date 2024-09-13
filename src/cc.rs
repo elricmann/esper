@@ -15,6 +15,7 @@ impl ClangCXX {
             .arg("-") // read from stdin
             .arg("-o")
             .arg(output_file)
+            .args(["--std","c++20"]) // @todo: pass from argparse
             .stdin(Stdio::piped())
             .stdout(Stdio::inherit()) // forward stdout
             .stderr(Stdio::inherit()) // forward stderr

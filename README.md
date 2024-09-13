@@ -491,7 +491,7 @@ end
 for (auto a : b) {}
 for (auto p : q.r) {}
 
-for (auto i : ranges::views::iota(0,10)) {
+for (auto i : views::iota(0,10)) {
   print(i);
 }
 

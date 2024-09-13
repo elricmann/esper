@@ -481,7 +481,7 @@ impl EmitDefault {
                 let lhs_str = self.emit_value(lhs);
                 let rhs_str = self.emit_value(rhs);
 
-                format!("ranges::views::iota({},{})", lhs_str, rhs_str)
+                format!("views::iota({}, {})", lhs_str, rhs_str)
             }
 
             // RHS can assume the LHS casts the C++ initializer lists

@@ -1,0 +1,21 @@
+let fib = |n: int|
+  let a: int = 0;
+  let b: int = 1;
+  let i: int = 0;
+
+  for i in 0..n
+    let temp: int = a + b;
+
+    a = b;
+    b = temp;
+
+    esper.print("fib", i + 1, "=", a, "\n")
+  end;
+
+  nullopt
+end
+
+let main: int = |argc: int, argv: vector<string>|
+  fib(10);
+  0
+end

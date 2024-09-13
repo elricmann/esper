@@ -12,7 +12,7 @@ use crate::emit::EmitDefault;
 use crate::parser::esper_parser;
 
 fn main() {
-    let source = include_str!("../tests/validate.esp");
+    let source = include_str!("../tests/fib.esp");
 
     match esper_parser::program(source) {
         Ok(program) => {
@@ -20,9 +20,9 @@ fn main() {
             let mut ctx = EmitContextImpl::new();
             ctx.use_prelude = true;
             let mut out = EmitDefault { ctx };
-            let out = out.emit_program(&program, "validate".into());
+            let out = out.emit_program(&program, "fib".into());
             // println!("{}", &out);
-            ClangCXX::compile(&out, "./tests/validate").unwrap();
+            ClangCXX::compile(&out, "./tests/fib").unwrap();
         }
 
         Err(err) => {
