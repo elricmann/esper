@@ -1,6 +1,7 @@
 (**
- * @filename parse.esp
+ * @source validate.esp
  * @brief validated program
+ * @use esper -p -e ./tests/validate.esp -o ./tests/validate.cc
  *)
 
 let main: int = |argc: int, argv: vector<string>|

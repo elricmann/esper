@@ -25,7 +25,7 @@ pub(crate) fn compile(
         Ok(program) => {
             // dbg!(&program);
             let mut ctx = EmitContextImpl::new();
-            ctx.use_prelude = true; // force?
+            ctx.use_prelude = use_prelude; // force?
             let mut emitter = EmitDefault { ctx };
             // dbg!(file_prefix(&input_path));
             let cxx_source = emitter.emit_program(&program, &file_prefix(&input_path).unwrap());
