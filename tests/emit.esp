@@ -1,7 +1,8 @@
 (**
- * @filename emit.esp
+ * @source emit.esp
  * @brief invalid & used to compare emitted output
- *)
+ * @use esper -e ./tests/emit.esp -o ./tests/emit.cc
+*)
 
 let n = 0
 let t = true
@@ -27,7 +28,7 @@ let add : int = |a: int, b: int| a + b end
 let n :| bool | int = 2
 
 let k = ||
-  if a > 2 then
+  if a gt 2 then
     true
   else
     false
@@ -126,6 +127,11 @@ type P =
   |a: int, b: | bool | float| ?int end
 end
 
-let main: int = ||
-  print(false)
-end
+(* ops *)
+
+let _ = a gt b
+let _ = a lt b
+let _ = a gte b
+let _ = a lte b
+let _ = a eq b
+let _ = a neq b

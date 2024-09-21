@@ -240,15 +240,17 @@ parser! {
     } / compare()
 
     rule compare_op() -> &'input str
-      = op:$(">" / "<" / ">=" / "<=") { op }
+      = op:$("gte" / "lte" / "gt" / "lt" / "eq" / "neq") { op }
 
     rule compare() -> Expr
       = lhs:primary() _ op:compare_op() _ rhs:primary() {
         let op_enum = match op {
-          ">" => CompareOp::Gt,
-          "<" => CompareOp::Lt,
-          ">=" => CompareOp::Gte,
-          "<=" => CompareOp::Lte,
+          "gt" => CompareOp::Gt,
+          "lt" => CompareOp::Lt,
+          "gte" => CompareOp::Gte,
+          "lte" => CompareOp::Lte,
+          "eq" => CompareOp::Eq,
+          "neq" => CompareOp::Neq,
           _ => unreachable!(),
         };
 
@@ -370,4 +372,6 @@ pub enum CompareOp {
     Lt,
     Gte,
     Lte,
+    Eq,
+    Neq,
 }

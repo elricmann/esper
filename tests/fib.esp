@@ -1,5 +1,5 @@
 (**
- * @filename fib.esp
+ * @source fib.esp
  * @brief iterable fibonacci
  *)
 

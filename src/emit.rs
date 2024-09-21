@@ -473,6 +473,8 @@ impl EmitDefault {
                     CompareOp::Lt => "<",
                     CompareOp::Gte => ">=",
                     CompareOp::Lte => "<=",
+                    CompareOp::Eq => "==",
+                    CompareOp::Neq => "!=",
                 };
 
                 format!("({} {} {})", lhs_str, op_str, rhs_str)
