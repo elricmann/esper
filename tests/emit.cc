@@ -24,7 +24,7 @@ float o = 0;
 decltype(0) r = 0;
 
 int add(int a, int b) {
-  return (a + b);
+return (a + b);
 }
 variant<bool, int> n = 2;
 
@@ -53,7 +53,7 @@ class B {
 public:
   int c;
   auto d(int a) {
-    return (a - c);
+return (a - c);
   }
 };
 vector<int> p = none;
@@ -62,7 +62,7 @@ tuple<int> swap(int a, int b) {
   auto tmp = a;
   a = b;
   b = tmp;
-  return {a, b};
+return {a, b};
 }
 
 for (auto a : b) {
@@ -138,7 +138,10 @@ auto _ = **a;
 auto _ = ***a;
 auto _ = ****a;
 int* _ = &a;
-template<typename U> using P = U**;
+
+auto p() {
+  return ;
+}
 } // namespace emit
 
 int main(int argc, const char** argv) { return emit::main(argc, std::vector<std::string>(argv + 1, argv + argc)); }

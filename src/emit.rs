@@ -121,6 +121,7 @@ impl EmitDefault {
                                     | Expr::Member(_)
                                     | Expr::Range(_, _)
                                     | Expr::Call(_, _)
+                                    | Expr::Pass
                                     | Expr::TypedCall(_, _, _)
                             ) {
                                 let indent = ctx.indent();
@@ -186,6 +187,7 @@ impl EmitDefault {
                                     | Expr::Member(_)
                                     | Expr::Range(_, _)
                                     | Expr::Call(_, _)
+                                    | Expr::Pass
                                     | Expr::TypedCall(_, _, _)
                             ) {
                                 let indent = ctx.indent();

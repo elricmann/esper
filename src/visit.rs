@@ -142,6 +142,8 @@ impl Visitor for Expr {
                 }
             }
 
+            Expr::Pass => {}
+
             Expr::TypedSymbol(_) => {}
 
             Expr::TypedSymbolGeneric(_, exprs) => {
