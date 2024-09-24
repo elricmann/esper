@@ -590,6 +590,22 @@ impl EmitDefault {
             Expr::TypedSymbol(type_name) => type_name.clone(),
             Expr::TypedVariant(lhs, rhs) => self.emit_variant(lhs, rhs),
 
+            Expr::TypedUnary(expr) => {
+                if let Expr::Unary(ty_expr, op) = &**expr {
+                    return format!(
+                        "{}{}",
+                        self.emit_type(&*ty_expr),
+                        match op {
+                            UnaryOp::Ref => "&",
+                            UnaryOp::Deref => "*",
+                            _ => "",
+                        },
+                    );
+                }
+
+                format!("")
+            }
+
             Expr::TypedLiteral(type_name) => {
                 format!("decltype({})", self.emit_value(type_name))
             }

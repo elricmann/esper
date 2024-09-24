@@ -2,9 +2,12 @@ use peg::parser;
 
 parser! {
   pub grammar esper_parser() for str {
-    rule typed_expr() -> Expr
+    rule typed_primary() -> Expr
       = typed_literal() / typed_member() / typed_symbol_generic() /
         typed_symbol() / type_optional() / typed_record() / typed_variant() / typed_fn_expr()
+    
+    rule typed_expr() -> Expr
+      =  typed_unary() / typed_primary()
 
     rule typed_literal() -> Expr
       = ty:(integer_literal() / float_literal() / bool_literal())
@@ -12,6 +15,27 @@ parser! {
 
     rule typed_symbol() -> Expr
       = id:identifier() { Expr::TypedSymbol(id.into()) }
+
+    rule typed_unary_op() -> UnaryOp
+    = op:$("&" / "*") {
+      match op {
+        "&" => UnaryOp::Ref,
+        "*" => UnaryOp::Deref,
+        _ => unreachable!(),
+      }
+    }
+
+    rule typed_unary() -> Expr
+    = ops:typed_unary_op()** _ expr:typed_primary() {
+      ops.into_iter().rev().fold(expr, |acc, op| {
+        Expr::TypedUnary(
+          Box::new(Expr::Unary(Box::new(acc), op))
+        )
+      })
+    }
+
+    // rule typed_unary() -> Expr
+    //   = e:unary() { Expr::TypedUnary(Box::new(e)) }
 
     rule type_optional() -> Expr
       = "?" _ ty:typed_expr() {
@@ -381,6 +405,7 @@ pub enum Expr {
     Struct(String, Vec<(String, Expr)>),
     TypedSymbol(String),
     TypedFn(Box<Expr>),
+    TypedUnary(Box<Expr>),
     TypedLiteral(Box<Expr>),
     TypedMember(Box<Expr>),
     TypedRecord(Box<Expr>),

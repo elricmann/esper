@@ -150,6 +150,7 @@ impl Visitor for Expr {
                 }
             }
 
+            Expr::TypedUnary(expr) => expr.visit(ctx, callback),
             Expr::TypedLiteral(expr) => expr.visit(ctx, callback),
 
             Expr::TypedMember(expr) => expr.visit(ctx, callback),

@@ -152,4 +152,12 @@ let _ = a rotr b
 
 let _ = ~a
 let _ = &a
+let _ = &&a
+let _ = &&&a
+let _ = &&&&a
 let _ = *a
+let _ = **a
+let _ = ***a
+let _ = ****a
+
+let _: *int = &a

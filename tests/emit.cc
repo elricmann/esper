@@ -130,7 +130,14 @@ auto _ = __builtin_rotateleft32(a, b);
 auto _ = __builtin_rotateright32(a, b);
 auto _ = ~a;
 auto _ = &a;
+auto _ = &&a;
+auto _ = &&&a;
+auto _ = &&&&a;
 auto _ = *a;
+auto _ = **a;
+auto _ = ***a;
+auto _ = ****a;
+int* _ = &a;
 } // namespace emit
 
 int main(int argc, const char** argv) { return emit::main(argc, std::vector<std::string>(argv + 1, argv + argc)); }
