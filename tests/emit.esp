@@ -147,3 +147,9 @@ let _ = a bor b
 let _ = a xor b
 let _ = a rotl b
 let _ = a rotr b
+
+(* unary ops *)
+
+let _ = ~a
+let _ = &a
+let _ = *a

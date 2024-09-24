@@ -179,7 +179,7 @@ parser! {
         identifier_expr() / list() / record()
 
     rule expr() -> Expr
-      = add_sub() / bit() / compare() / primary()
+      = add_sub() / unary() / bit() / compare() / primary()
 
     rule paren_expr() -> Expr
       = "(" _ e:expr() _ ")" { e }
@@ -314,6 +314,23 @@ parser! {
       (pat.into(), body)
     }
 
+    rule unary_op() -> UnaryOp
+    = op:$("~" / "&" / "*") {
+      match op {
+        "~" => UnaryOp::BitNot,
+        "&" => UnaryOp::Ref,
+        "*" => UnaryOp::Deref,
+        _ => unreachable!(),
+      }
+    }
+
+    rule unary() -> Expr
+    = ops:unary_op()** _ expr:primary() {
+      ops.into_iter().rev().fold(expr, |acc, op| {
+        Expr::Unary(Box::new(acc), op)
+      })
+    }
+
     rule body_expr() -> Vec<Expr>
       = expr() ** (_ ";" _)
 
@@ -351,6 +368,7 @@ pub enum Expr {
     Record(Vec<Vec<Expr>>),
     Range(Box<Expr>, Box<Expr>),
     Directive(Box<Expr>, Box<Expr>),
+    Unary(Box<Expr>, UnaryOp),
     Bin(Box<Expr>, BinOp, Box<Expr>),
     Compare(Box<Expr>, CompareOp, Box<Expr>),
     Bit(Box<Expr>, BitOp, Box<Expr>),
@@ -403,4 +421,11 @@ pub enum BitOp {
     Xor,
     Rotl,
     Rotr,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub enum UnaryOp {
+    Ref,
+    Deref,
+    BitNot,
 }

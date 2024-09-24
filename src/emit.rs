@@ -1,4 +1,4 @@
-use crate::parser::{BinOp, BitOp, CompareOp, Expr};
+use crate::parser::{BinOp, BitOp, CompareOp, Expr, UnaryOp};
 use crate::visit::{EsperContext, Visitor};
 
 // note: esper outputs with some non-practical patterns:
@@ -480,6 +480,17 @@ impl EmitDefault {
                 };
 
                 format!("({} {} {})", lhs_str, op_str, rhs_str)
+            }
+
+            Expr::Unary(expr, op) => {
+                let expr_str = self.emit_value(expr);
+                let op_str = match op {
+                    UnaryOp::Ref => "&",
+                    UnaryOp::Deref => "*",
+                    UnaryOp::BitNot => "~",
+                };
+
+                format!("{}{}", op_str, expr_str)
             }
 
             Expr::Bit(lhs, op, rhs) => {

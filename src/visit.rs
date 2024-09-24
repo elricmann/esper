@@ -79,6 +79,10 @@ impl Visitor for Expr {
                 rhs.visit(ctx, callback);
             }
 
+            Expr::Unary(expr, _) => {
+                expr.visit(ctx, callback);
+            }
+
             Expr::If(cond, then_body, else_body) => {
                 cond.visit(ctx, callback);
 
