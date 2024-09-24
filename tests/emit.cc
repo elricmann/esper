@@ -138,6 +138,7 @@ auto _ = **a;
 auto _ = ***a;
 auto _ = ****a;
 int* _ = &a;
+template<typename U> using P = U**;
 } // namespace emit
 
 int main(int argc, const char** argv) { return emit::main(argc, std::vector<std::string>(argv + 1, argv + argc)); }

@@ -5,7 +5,7 @@ parser! {
     rule typed_primary() -> Expr
       = typed_literal() / typed_member() / typed_symbol_generic() /
         typed_symbol() / type_optional() / typed_record() / typed_variant() / typed_fn_expr()
-    
+
     rule typed_expr() -> Expr
       =  typed_unary() / typed_primary()
 
@@ -114,6 +114,9 @@ parser! {
 
     rule comment() = "(*" (!"*)" [_])* "*)"
 
+    rule pass() -> Expr
+      = "pass" { Expr::Pass }
+
     rule identifier() -> &'input str
       = quiet!{s:$(['a'..='z' | 'A'..='Z' | '_']+)} / expected!("identifier")
       // { s.into() }
@@ -198,7 +201,7 @@ parser! {
     rule primary() -> Expr
       = assign() / paren_expr() / directive_expr() / match_expr() / struct_expr() /
         type_alias() / call_expr() / range_expr() / member_expr() /
-        loop_expr() / if_expr() / fn_expr() / let_binding() / bool_literal() /
+        loop_expr() / if_expr() / fn_expr() / let_binding() / pass() / bool_literal() /
         float_literal() / integer_literal() / string_literal() / char_literal() /
         identifier_expr() / list() / record()
 
@@ -387,7 +390,7 @@ pub enum Expr {
     Bool(bool),
     Char(char),
     String(String),
-    // @todo: box members
+    Pass,
     List(Vec<Expr>),
     Record(Vec<Vec<Expr>>),
     Range(Box<Expr>, Box<Expr>),

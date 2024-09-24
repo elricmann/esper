@@ -70,7 +70,7 @@ _-_
 <td>
 
 ```fs
-type T <K> = K end
+type T<K> = K end
 ```
 
 </td>
@@ -79,6 +79,35 @@ type T <K> = K end
 ```cpp
 template<typename K>
 using T = K;
+```
+
+</td>
+<td>
+
+_Type parameters are required when instantiating._
+
+</td>
+</tr>
+
+<!-- Reference & pointer types -->
+<tr>
+<td>Reference & pointer types</td>
+<td>
+
+```fs
+type T<K> = &K end
+type P<U> = **U end
+```
+
+</td>
+<td>
+
+```cpp
+template<typename K>
+using T = &K;
+
+template<typename U>
+using P = **U;
 ```
 
 </td>
@@ -278,8 +307,6 @@ _Return types are parsed as `type_expr` rule, values are treated as types regard
 <td>
 
 ```fs
-let n: | int | bool = 0
-
 match n with
 | int ->
   print("-> scope");
@@ -291,12 +318,27 @@ end
 </td>
 <td>
 
-_-_
+```cpp
+std::visit([](auto&& _) {
+  using T = std::decay_t<decltype(_)>;
+  if constexpr (std::is_same_v<T, int>) {
+    print("-> scope");
+    print("int: ", _);
+  }
+  if constexpr (std::is_same_v<T, string>) {
+    print("string: ", _);
+  }
+  }, n);
+```
 
 </td>
 <td>
 
-_Non-exhaustive matching, inner values captured as the `_`symbol. Requires`std::visit`and decaying inner value to base value types. Ideally,`get_if`and`holds_alternative` are performant but not as rigorous.\*
+<i>
+
+Non-exhaustive matching, inner values captured as the `_`symbol. Requires`std::visit`and decaying inner value to base value types. Ideally,`get_if`and`holds_alternative` are performant but not as rigorous.
+
+</i>
 
 </td>
 </tr>
@@ -525,7 +567,7 @@ _-_
 
 ### Postscriptum
 
-Esper is **experimental** and aims to stay minimal. It may be clear by the absence of syntax like indexing access, equality checks, bitwise operators and value-based pointer/reference syntax (which is the case for now, but regarded as a _missing feature_). Aside, most matching semantics are not optimized, e.g `std::visit` for pattern matching is a known performance bottleneck, exclusively using STL Containers (`argv` is cast from a `const char**`), all `libstdc++` headers are included in the prelude, passing by value is exclusive and a wide range of impracticable error handling; with `clang++` errors being piped to `stdin`, PEG's obscure parsing errors and no type-level resolution of expressions.
+Esper is **experimental** and aims to stay minimal. Matching semantics are not optimized, e.g `std::visit` for pattern matching is a known performance bottleneck, exclusively using STL Containers (`argv` is cast from a `const char**`), all `libstdc++` headers are included in the optional prelude, passing by value is exclusive and a wide range of impracticable error handling; with `clang++` errors being piped to `stdin`, PEG's obscure parsing errors (resolved in `v0.2`) and no type-level resolution of expressions (requires a complete type system and call graph).
 
 ### License
 
