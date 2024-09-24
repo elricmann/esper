@@ -5,4 +5,5 @@ edition = "2021"
 
 [dependencies]
 peg = "0.8.4"
+chic = "1.2.2"
 structopt = "0.3"

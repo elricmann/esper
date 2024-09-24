@@ -1,6 +1,7 @@
 use crate::emit::{EmitContextImpl, EmitDefault};
 use crate::parser::esper_parser;
 
+use std::error::Error;
 use std::fs::{self, File};
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -38,8 +39,38 @@ pub(crate) fn compile(
             }
         }
 
-        Err(err) => {
-            println!("{}", err);
+        Err(peg_err) => {
+            let error_line = peg_err.location.line;
+            let error_offset = peg_err.location.offset;
+            let total_lines = source.lines().count();
+
+            let display_start = if error_line > 2 { error_line - 2 } else { 1 };
+
+            let display_end = if error_line + 2 <= total_lines {
+                error_line + 2
+            } else {
+                total_lines
+            };
+
+            let src_lines: Vec<&str> = source.lines().collect();
+            let src_slice = &src_lines[display_start - 1..display_end];
+
+            let src = src_slice.join("\n");
+
+            // @fix expected won't appear unless the entire source is passed
+            let expected_msg = format!("expected: {}", peg_err.expected);
+
+            let msg = chic::Error::new("parse error")
+                .error(
+                    error_line,
+                    error_offset,
+                    error_offset + 1,
+                    &src,
+                    expected_msg,
+                )
+                .to_string();
+
+            eprintln!("{}", msg);
         }
     }
 }
