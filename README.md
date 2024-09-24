@@ -453,6 +453,8 @@ _Initialization of a value is expected. Default type is `auto`. Multiple definit
 <td>
 
 ```fs
+let _ = || pass end (* since v0.2 *)
+
 let add: int = |a: int, b: int| a + b end
 
 let swap: tuple<int> = |a: int, b: int|
@@ -467,6 +469,8 @@ end
 <td>
 
 ```cpp
+auto _() { return; }
+
 int add(int a, int b) { return (a + b); }
 
 std::tuple<int> swap(a: int, b: int) {
@@ -552,6 +556,68 @@ for (auto i : views::iota(0,10)) {
 for (auto [a, b] : c) {
   print(a, b);
 }
+```
+
+</td>
+<td>
+
+_-_
+
+</td>
+</tr>
+
+<!-- Value operators -->
+<tr>
+<td>
+
+Value operators (since `v0.2`)
+
+</td>
+<td>
+
+```fs
+~a
+&a
+&&a
+a gt b
+a lt b
+a gte b
+a lte b
+a eq b
+a neq b
+a and b
+a or b
+a shl b
+a shr b
+a band b
+a bor b
+a xor b
+a rotl b
+a rotr b
+```
+
+</td>
+<td>
+
+```cpp
+~a
+&a
+&&a
+(a > b);
+(a < b);
+(a >= b);
+(a <= b);
+(a == b);
+(a != b);
+(a && b);
+(a || b);
+(a << b);
+(a >> b);
+(a & b);
+(a | b);
+(a ^ b);
+__builtin_rotateleft32(a, b);
+__builtin_rotateright32(a, b);
 ```
 
 </td>
