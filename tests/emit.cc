@@ -119,10 +119,13 @@ auto _ = (a >= b);
 auto _ = (a <= b);
 auto _ = (a == b);
 auto _ = (a != b);
+auto _ = (a && b);
+auto _ = (a || b);
 auto _ = (a << b);
 auto _ = (a >> b);
 auto _ = (a & b);
 auto _ = (a | b);
+auto _ = (a ^ b);
 auto _ = __builtin_rotateleft32(a, b);
 auto _ = __builtin_rotateright32(a, b);
 } // namespace emit

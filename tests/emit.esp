@@ -135,12 +135,15 @@ let _ = a gte b
 let _ = a lte b
 let _ = a eq b
 let _ = a neq b
+let _ = a and b
+let _ = a or b
 
 (* bitwise ops *)
 
 let _ = a shl b
 let _ = a shr b
-let _ = a and b
-let _ = a or b
+let _ = a band b
+let _ = a bor b
+let _ = a xor b
 let _ = a rotl b
 let _ = a rotr b

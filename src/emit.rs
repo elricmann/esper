@@ -475,6 +475,8 @@ impl EmitDefault {
                     CompareOp::Lte => "<=",
                     CompareOp::Eq => "==",
                     CompareOp::Neq => "!=",
+                    CompareOp::And => "&&",
+                    CompareOp::Or => "||",
                 };
 
                 format!("({} {} {})", lhs_str, op_str, rhs_str)
@@ -499,6 +501,7 @@ impl EmitDefault {
                         BitOp::Shr => ">>",
                         BitOp::And => "&",
                         BitOp::Or => "|",
+                        BitOp::Xor => "^",
                         _ => "",
                     };
 

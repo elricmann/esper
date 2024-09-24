@@ -240,7 +240,7 @@ parser! {
     } / bit() / compare()
 
     rule compare_op() -> &'input str
-      = op:$("gte" / "lte" / "gt" / "lt" / "eq" / "neq") { op }
+      = op:$("gte" / "lte" / "gt" / "lt" / "eq" / "neq" / "and" / "or") { op }
 
     rule compare() -> Expr
       = lhs:primary() _ op:compare_op() _ rhs:primary() {
@@ -251,6 +251,8 @@ parser! {
           "lte" => CompareOp::Lte,
           "eq" => CompareOp::Eq,
           "neq" => CompareOp::Neq,
+          "and" => CompareOp::And,
+          "or" => CompareOp::Or,
           _ => unreachable!(),
         };
 
@@ -258,15 +260,16 @@ parser! {
     } / primary()
 
     rule bit_op() -> &'input str
-      = op:$("shl" / "shr" / "and" / "or" / "rotl" / "rotr") { op }
+      = op:$("shl" / "shr" / "band" / "bor" / "xor" / "rotl" / "rotr") { op }
 
     rule bit() -> Expr
       = lhs:primary() _ op:bit_op() _ rhs:primary() {
         let op_enum = match op {
           "shl" => BitOp::Shl,
           "shr" => BitOp::Shr,
-          "and" => BitOp::And,
-          "or" => BitOp::Or,
+          "band" => BitOp::And,
+          "bor" => BitOp::Or,
+          "xor" => BitOp::Xor,
           "rotl" => BitOp::Rotl,
           "rotr" => BitOp::Rotr,
           _ => unreachable!(),
@@ -387,6 +390,8 @@ pub enum CompareOp {
     Lte,
     Eq,
     Neq,
+    And,
+    Or,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -395,6 +400,7 @@ pub enum BitOp {
     Shr,
     And,
     Or,
+    Xor,
     Rotl,
     Rotr,
 }
