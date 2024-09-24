@@ -74,6 +74,11 @@ impl Visitor for Expr {
                 rhs.visit(ctx, callback);
             }
 
+            Expr::Bit(lhs, _, rhs) => {
+                lhs.visit(ctx, callback);
+                rhs.visit(ctx, callback);
+            }
+
             Expr::If(cond, then_body, else_body) => {
                 cond.visit(ctx, callback);
 

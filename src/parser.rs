@@ -179,7 +179,7 @@ parser! {
         identifier_expr() / list() / record()
 
     rule expr() -> Expr
-      = add_sub() / compare() / primary()
+      = add_sub() / bit() / compare() / primary()
 
     rule paren_expr() -> Expr
       = "(" _ e:expr() _ ")" { e }
@@ -237,7 +237,7 @@ parser! {
         };
 
         Expr::Bin(Box::new(lhs), op_enum, Box::new(rhs))
-    } / compare()
+    } / bit() / compare()
 
     rule compare_op() -> &'input str
       = op:$("gte" / "lte" / "gt" / "lt" / "eq" / "neq") { op }
@@ -257,6 +257,24 @@ parser! {
         Expr::Compare(Box::new(lhs), op_enum, Box::new(rhs))
     } / primary()
 
+    rule bit_op() -> &'input str
+      = op:$("shl" / "shr" / "and" / "or" / "rotl" / "rotr") { op }
+
+    rule bit() -> Expr
+      = lhs:primary() _ op:bit_op() _ rhs:primary() {
+        let op_enum = match op {
+          "shl" => BitOp::Shl,
+          "shr" => BitOp::Shr,
+          "and" => BitOp::And,
+          "or" => BitOp::Or,
+          "rotl" => BitOp::Rotl,
+          "rotr" => BitOp::Rotr,
+          _ => unreachable!(),
+        };
+
+        Expr::Bit(Box::new(lhs), op_enum, Box::new(rhs))
+    }
+
     rule if_expr() -> Expr
       = "if" _ cond:expr() _ "then" _ then_body:body_expr() _ "end" {
       Expr::If(Box::new(cond), then_body, None)
@@ -269,11 +287,6 @@ parser! {
       = "for" _ loop_var:expr() _ "in" _ iter:primary() _ body:body_expr() _ "end" {
         Expr::Loop(Box::new(loop_var), Box::new(iter), body)
     }
-
-    // rule fn_expr() -> Expr
-    //   = "|" _ args:(identifier() ** (_ "," _)) _ "|" _ body:body_expr() _ "end" {
-    //   Expr::Fn(args.into_iter().map(|arg| arg.into()).collect(), body)
-    // }
 
     rule fn_expr() -> Expr
     = "|" _ args:(fn_arg() ** (_ "," _)) _ "|" _ body:body_expr() _ "end" {
@@ -336,8 +349,8 @@ pub enum Expr {
     Range(Box<Expr>, Box<Expr>),
     Directive(Box<Expr>, Box<Expr>),
     Bin(Box<Expr>, BinOp, Box<Expr>),
-    // @fix: precedence of >= <=
     Compare(Box<Expr>, CompareOp, Box<Expr>),
+    Bit(Box<Expr>, BitOp, Box<Expr>),
     If(Box<Expr>, Vec<Expr>, Option<Vec<Expr>>),
     Loop(Box<Expr>, Box<Expr>, Vec<Expr>),
     Match(Box<Expr>, Vec<(String, Vec<Expr>)>),
@@ -374,4 +387,14 @@ pub enum CompareOp {
     Lte,
     Eq,
     Neq,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub enum BitOp {
+    Shl,
+    Shr,
+    And,
+    Or,
+    Rotl,
+    Rotr,
 }

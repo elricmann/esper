@@ -127,7 +127,7 @@ type P =
   |a: int, b: | bool | float| ?int end
 end
 
-(* ops *)
+(* compare ops *)
 
 let _ = a gt b
 let _ = a lt b
@@ -135,3 +135,12 @@ let _ = a gte b
 let _ = a lte b
 let _ = a eq b
 let _ = a neq b
+
+(* bitwise ops *)
+
+let _ = a shl b
+let _ = a shr b
+let _ = a and b
+let _ = a or b
+let _ = a rotl b
+let _ = a rotr b

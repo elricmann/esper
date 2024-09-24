@@ -1,4 +1,4 @@
-use crate::parser::{BinOp, CompareOp, Expr};
+use crate::parser::{BinOp, BitOp, CompareOp, Expr};
 use crate::visit::{EsperContext, Visitor};
 
 // note: esper outputs with some non-practical patterns:
@@ -478,6 +478,32 @@ impl EmitDefault {
                 };
 
                 format!("({} {} {})", lhs_str, op_str, rhs_str)
+            }
+
+            Expr::Bit(lhs, op, rhs) => {
+                if matches!(&op, BitOp::Rotl | BitOp::Rotr) {
+                    let lhs_str = self.emit_value(lhs);
+                    let rhs_str = self.emit_value(rhs);
+                    let op_str = match op {
+                        BitOp::Rotl => "__builtin_rotateleft32",
+                        BitOp::Rotr => "__builtin_rotateright32",
+                        _ => "",
+                    };
+
+                    format!("{}({}, {})", op_str, lhs_str, rhs_str)
+                } else {
+                    let lhs_str = self.emit_value(lhs);
+                    let rhs_str = self.emit_value(rhs);
+                    let op_str = match op {
+                        BitOp::Shl => "<<",
+                        BitOp::Shr => ">>",
+                        BitOp::And => "&",
+                        BitOp::Or => "|",
+                        _ => "",
+                    };
+
+                    format!("({} {} {})", lhs_str, op_str, rhs_str)
+                }
             }
 
             Expr::Range(lhs, rhs) => {
