@@ -427,6 +427,43 @@ impl EmitDefault {
                             }
                         }
                     }
+                } else {
+                    // only go through modifiers that are non-call exprs
+                    let out = self.emit_value(&Expr::Directive(
+                        Box::new(directive.as_ref().to_owned()),
+                        Box::new(expr.as_ref().to_owned()),
+                    ));
+
+                    if matches!(
+                        **expr,
+                        Expr::Int(_)
+                            | Expr::Float(_)
+                            | Expr::Bool(_)
+                            | Expr::Char(_)
+                            | Expr::String(_)
+                            | Expr::Var(_)
+                            | Expr::Bin(_, _, _)
+                            | Expr::Compare(_, _, _)
+                            | Expr::List(_)
+                            | Expr::Member(_)
+                            | Expr::Range(_, _)
+                            | Expr::Call(_, _)
+                            | Expr::Pass
+                            | Expr::TypedCall(_, _, _)
+                    ) {
+                        // modifiers on expressions (emit_value)
+                        dbg!("MODIFIER ON EXPR");
+                        dbg!(out.clone());
+                        let indent = ctx.indent();
+                        ctx.emit(&format!("{}{};", indent, out));
+                    } else {
+                        // modifiers on statements (emit_expr)
+                        dbg!("MODIFIER ON STATEMENT");
+                        dbg!(expr.clone());
+                        let indent = ctx.indent();
+                        ctx.emit(&format!("{}{}", indent, out));
+                        self.emit_expr(ctx, expr);
+                    }
                 }
             }
 
@@ -573,6 +610,26 @@ impl EmitDefault {
                     .join(", ");
 
                 return format!("{}{}({})", callee_str, generics_str, args_str);
+            }
+
+            Expr::Directive(directive, expr) => {
+                if let Expr::Var(directive_name) = directive.as_ref() {
+                    let mut specifier = String::new();
+
+                    match directive_name.as_str() {
+                        "const" => specifier = "constexpr".to_string(),
+                        "static" => specifier = "static".to_string(),
+                        "inline" => specifier = "inline".to_string(),
+                        _ => {}
+                    }
+
+                    if !specifier.is_empty() {
+                        let value = self.emit_value(expr);
+                        return format!("{} {}", specifier, value);
+                    }
+                }
+
+                String::new()
             }
 
             _ => String::new(),
