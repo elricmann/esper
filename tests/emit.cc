@@ -142,8 +142,12 @@ int* _ = &a;
 auto p() {
   return ;
 }
+static
+inline
 constexpr 
-auto n = 0;
+auto n = static 0;
+constexpr 
+auto k = static b;
 } // namespace emit
 
 int main(int argc, const char** argv) { return emit::main(argc, std::vector<std::string>(argv + 1, argv + argc)); }

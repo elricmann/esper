@@ -166,4 +166,5 @@ let p = || pass end
 
 (* modifiers *)
 
-@const let n = 0
+@static @inline @const let n = @static 0
+@const let k = @static b

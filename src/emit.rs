@@ -452,14 +452,10 @@ impl EmitDefault {
                             | Expr::TypedCall(_, _, _)
                     ) {
                         // modifiers on expressions (emit_value)
-                        dbg!("MODIFIER ON EXPR");
-                        dbg!(out.clone());
                         let indent = ctx.indent();
                         ctx.emit(&format!("{}{};", indent, out));
                     } else {
                         // modifiers on statements (emit_expr)
-                        dbg!("MODIFIER ON STATEMENT");
-                        dbg!(expr.clone());
                         let indent = ctx.indent();
                         ctx.emit(&format!("{}{}", indent, out));
                         self.emit_expr(ctx, expr);
@@ -624,8 +620,12 @@ impl EmitDefault {
                     }
 
                     if !specifier.is_empty() {
-                        let value = self.emit_value(expr);
-                        return format!("{} {}", specifier, value);
+                        if matches!(**expr, Expr::Directive(_, _)) {
+                            return format!("{}", specifier);
+                        } else {
+                            let value = self.emit_value(expr);
+                            return format!("{} {}", specifier, value);
+                        }
                     }
                 }
 
